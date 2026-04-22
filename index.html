@@ -1,0 +1,5071 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="לִשׁוֹן">
+<meta name="theme-color" content="#0d0d1a">
+<title>לִשׁוֹן — Hebrew through Song</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d1a;
+  --surface: #1a1a2e;
+  --card: #1e2540;
+  --border: rgba(255,255,255,0.08);
+  --gold: #f0a500;
+  --gold-glow: rgba(240,165,0,0.25);
+  --gold-dim: #c88800;
+  --white: #f0f0f0;
+  --muted: #6b7a99;
+  --translation: #8892a4;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; }
+.screen { position: fixed; inset: 0; overflow-y: auto; background: var(--bg); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s; will-change: transform; }
+.screen.hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
+.screen.slide-up { transform: translateY(0); opacity: 1; }
+
+/* ── HOME ── */
+#home { padding-top: var(--safe-top); }
+.home-header { padding: 20px 20px 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+.app-name { font-family: 'Frank Ruhl Libre', serif; font-size: 42px; font-weight: 900; color: var(--gold); letter-spacing: 2px; line-height: 1; }
+.app-sub { font-size: 13px; color: var(--muted); margin-top: 4px; font-family: 'Inter', sans-serif; direction: ltr; text-align: left; }
+.words-badge { background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font-size: 13px; color: var(--gold); font-weight: 600; white-space: nowrap; flex-shrink: 0; transition: transform 0.2s; }
+.words-badge.pop { transform: scale(1.2); }
+.search-wrap { padding: 0 20px 12px; }
+.search-box { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; color: var(--white); font-size: 15px; outline: none; direction: rtl; font-family: 'Inter', sans-serif; }
+.search-box::placeholder { color: var(--muted); }
+.search-box:focus { border-color: rgba(240,165,0,0.4); }
+.genres { display: flex; gap: 8px; padding: 0 20px 16px; overflow-x: auto; scrollbar-width: none; }
+.genres::-webkit-scrollbar { display: none; }
+.genre-chip { background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'Inter', sans-serif; direction: ltr; }
+.genre-chip.active { background: rgba(240,165,0,0.15); border-color: var(--gold); color: var(--gold); }
+.song-list { padding: 0 20px; padding-bottom: calc(20px + var(--safe-bottom)); display: flex; flex-direction: column; gap: 10px; }
+.song-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; direction: rtl; }
+.song-card:active { transform: scale(0.97); box-shadow: 0 0 0 2px var(--gold-glow); }
+.cover-swatch { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+.cover-letter { font-family: 'Frank Ruhl Libre', serif; font-size: 30px; font-weight: 900; color: rgba(255,255,255,0.85); }
+.song-info { flex: 1; min-width: 0; }
+.song-title-he { font-family: 'Frank Ruhl Libre', serif; font-size: 18px; font-weight: 700; color: var(--white); }
+.song-title-tr { font-size: 13px; color: var(--muted); margin-top: 2px; direction: ltr; text-align: right; }
+.song-artist { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.song-meta { display: flex; gap: 6px; align-items: center; margin-top: 6px; flex-wrap: wrap; direction: ltr; justify-content: flex-end; }
+.genre-tag { background: rgba(255,255,255,0.06); border-radius: 999px; padding: 2px 10px; font-size: 11px; color: var(--muted); }
+.meta-dot { color: var(--border); font-size: 10px; }
+.chevron { color: var(--muted); font-size: 22px; flex-shrink: 0; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-emoji { font-size: 48px; margin-bottom: 12px; }
+
+/* ── LYRICS ── */
+#lyrics { padding-top: var(--safe-top); display: flex; flex-direction: column; }
+.lyrics-header { display: flex; align-items: center; padding: 12px 16px; gap: 12px; flex-shrink: 0; border-bottom: 1px solid var(--border); direction: ltr; }
+.back-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: var(--card); border: 1px solid var(--border); cursor: pointer; font-size: 22px; color: var(--gold); transition: transform 0.15s; flex-shrink: 0; }
+.back-btn:active { transform: scale(0.9); }
+.lyrics-header-info { flex: 1; overflow: hidden; }
+.lyrics-header-title { font-size: 15px; font-weight: 700; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Frank Ruhl Libre', serif; direction: rtl; }
+.lyrics-header-artist { font-size: 12px; color: var(--muted); direction: ltr; }
+.hero { padding: 20px; flex-shrink: 0; }
+.hero-title { font-family: 'Frank Ruhl Libre', serif; font-size: 36px; font-weight: 900; color: rgba(255,255,255,0.95); margin-bottom: 4px; direction: rtl; }
+.hero-translit { font-size: 17px; color: rgba(255,255,255,0.75); margin-bottom: 2px; direction: ltr; }
+.hero-en { font-size: 14px; color: rgba(255,255,255,0.5); font-style: italic; margin-bottom: 12px; direction: ltr; }
+.hero-meta { display: flex; gap: 8px; align-items: center; direction: ltr; flex-wrap: wrap; }
+.hero-pill { background: rgba(0,0,0,0.3); border-radius: 999px; padding: 4px 12px; font-size: 12px; color: rgba(255,255,255,0.7); }
+.toolbar { display: flex; align-items: center; gap: 0; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; flex-shrink: 0; direction: ltr; }
+.toggle-btn { flex: 1; padding: 12px 8px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--muted); cursor: pointer; font-family: 'Inter', sans-serif; }
+.toggle-btn.active { color: var(--gold); }
+.toggle-dot { width: 28px; height: 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); position: relative; transition: background 0.2s; }
+.toggle-dot.on { background: rgba(240,165,0,0.3); border-color: var(--gold); }
+.toggle-dot::after { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); transition: transform 0.2s, background 0.2s; }
+.toggle-dot.on::after { transform: translateX(12px); background: var(--gold); }
+.toolbar-divider { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+.size-btn { padding: 10px 16px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; border: 1px solid var(--border); border-radius: 8px; background: var(--card); margin: 8px; transition: all 0.15s; }
+.size-btn.active { color: var(--gold); border-color: var(--gold); background: rgba(240,165,0,0.1); }
+.lyrics-scroll { flex: 1; overflow-y: auto; padding: 16px 12px; padding-bottom: calc(32px + var(--safe-bottom)); }
+.lyric-line { display: flex; flex-direction: row-reverse; flex-wrap: wrap; justify-content: flex-end; align-items: flex-start; margin-bottom: 8px; gap: 4px; }
+.word-card { display: flex; flex-direction: column; align-items: center; padding: 8px 10px; border-radius: 10px; border: 1.5px solid transparent; cursor: pointer; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s; min-width: 44px; background: transparent; }
+.word-card:active { transform: scale(0.95); }
+.word-card.highlighted { border-color: var(--gold); background: rgba(240,165,0,0.1); box-shadow: 0 0 12px var(--gold-glow); }
+.w-hebrew { font-family: 'Frank Ruhl Libre', serif; font-size: 28px; font-weight: 700; color: var(--gold); text-align: center; line-height: 1.2; }
+.w-translit { font-size: 13px; color: var(--white); text-align: center; margin-top: 3px; opacity: 0.85; direction: ltr; transition: all 0.25s; overflow: hidden; max-height: 30px; }
+.w-translit.hidden { max-height: 0; opacity: 0; margin-top: 0; }
+.w-translation { font-size: 11px; color: var(--translation); text-align: center; margin-top: 2px; font-style: italic; direction: ltr; transition: all 0.25s; overflow: hidden; max-height: 30px; }
+.w-translation.hidden { max-height: 0; opacity: 0; margin-top: 0; }
+.w-hebrew.large { font-size: 36px; }
+.w-translit.large { font-size: 15px; }
+.w-translation.large { font-size: 13px; }
+.lyrics-footer { text-align: center; padding: 24px; color: var(--muted); font-size: 13px; }
+.progress-bar { display: flex; justify-content: center; gap: 5px; padding: 12px; }
+.progress-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
+.progress-dot.active { background: var(--gold); }
+
+/* milestone toast */
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: var(--surface); border: 1px solid var(--gold); border-radius: 20px; padding: 16px 28px; font-size: 22px; text-align: center; z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; opacity: 0; pointer-events: none; }
+.toast.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- HOME SCREEN -->
+<div id="home" class="screen slide-up">
+  <div class="home-header">
+    <div>
+      <div class="app-name">לִשׁוֹן</div>
+      <div class="app-sub" dir="ltr">Learn Hebrew through song</div>
+    </div>
+    <div class="words-badge" id="words-badge">✨ 0 words</div>
+  </div>
+  <div class="search-wrap">
+    <input class="search-box" type="search" placeholder="חפש שיר או אמן..." id="search-input">
+  </div>
+  <div class="genres" id="genres"></div>
+  <div class="song-list" id="song-list"></div>
+</div>
+
+<!-- LYRICS SCREEN -->
+<div id="lyrics" class="screen hidden">
+  <div class="lyrics-header">
+    <div class="back-btn" id="back-btn">‹</div>
+    <div class="lyrics-header-info">
+      <div class="lyrics-header-title" id="lyrics-header-title"></div>
+      <div class="lyrics-header-artist" id="lyrics-header-artist"></div>
+    </div>
+  </div>
+  <div id="hero" class="hero"></div>
+  <div class="toolbar" id="toolbar">
+    <div class="toggle-btn active" id="toggle-translit" onclick="toggleTranslit()">
+      <span>תעתיק</span>
+      <div class="toggle-dot on" id="dot-translit"></div>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toggle-btn active" id="toggle-trans" onclick="toggleTrans()">
+      <span>תרגום</span>
+      <div class="toggle-dot on" id="dot-trans"></div>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="size-btn" id="size-btn" onclick="toggleSize()">Aa</div>
+  </div>
+  <div class="lyrics-scroll" id="lyrics-content"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SONGS = [
+  {
+    "id": "holech-batel",
+    "title": "הולך בטל",
+    "titleTranslit": "Holech Batel",
+    "titleEn": "Wandering Idle",
+    "artist": "תמוז",
+    "artistEn": "Tamuz",
+    "year": 1984,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#2d4a6e",
+    "lines": [
+      [
+        {
+          "hebrew": "הולך",
+          "transliteration": "holech",
+          "translation": "walking",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בטל",
+          "transliteration": "batel",
+          "translation": "idle",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ברחובות",
+          "transliteration": "birechavot",
+          "translation": "in the streets",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "העיר",
+          "transliteration": "ha'ir",
+          "translation": "of the city",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מחפש",
+          "transliteration": "mechapes",
+          "translation": "searching",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "משהו",
+          "transliteration": "mashehu",
+          "translation": "something",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שאבד",
+          "transliteration": "she'avad",
+          "translation": "that was lost",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לו",
+          "transliteration": "lo",
+          "translation": "to him",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מזמן",
+          "transliteration": "mizman",
+          "translation": "long ago",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יודע",
+          "transliteration": "yode'a",
+          "translation": "knowing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לאן",
+          "transliteration": "le'an",
+          "translation": "where to",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ולא",
+          "transliteration": "velo",
+          "translation": "and not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יודע",
+          "transliteration": "yode'a",
+          "translation": "knowing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מאין",
+          "transliteration": "me'ayin",
+          "translation": "from where",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הולך",
+          "transliteration": "holech",
+          "translation": "walking",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בטל",
+          "transliteration": "batel",
+          "translation": "idle",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תחת",
+          "transliteration": "tachat",
+          "translation": "under",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמש",
+          "transliteration": "shemesh",
+          "translation": "sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כבדה",
+          "transliteration": "kaved'a",
+          "translation": "heavy",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואין",
+          "transliteration": "ve'ein",
+          "translation": "and there is no",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לו",
+          "transliteration": "lo",
+          "translation": "to him",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מנוח",
+          "transliteration": "mano'ach",
+          "translation": "rest",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ואין",
+          "transliteration": "ve'ein",
+          "translation": "and there is no",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לו",
+          "transliteration": "lo",
+          "translation": "to him",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בית",
+          "transliteration": "bayit",
+          "translation": "home",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הולך",
+          "transliteration": "holech",
+          "translation": "walking",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בטל",
+          "transliteration": "batel",
+          "translation": "idle",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "all",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הלילה",
+          "transliteration": "halayla",
+          "translation": "the night",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "chozer-leSinai",
+    "title": "חוזר לסיני - מה קשור",
+    "titleTranslit": "Chozer LeSinai - Ma Kashur",
+    "titleEn": "Going Back to Sinai - What's the Connection",
+    "artist": "מאור כהן",
+    "artistEn": "Maor Cohen",
+    "year": 2000,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#c8a96e",
+    "lines": [
+      [
+        {
+          "hebrew": "חוזר",
+          "transliteration": "chozer",
+          "translation": "returning",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לסיני",
+          "transliteration": "leSinai",
+          "translation": "to Sinai",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קשור",
+          "transliteration": "kashur",
+          "translation": "connected",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יכול",
+          "transliteration": "yachol",
+          "translation": "can",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לשכוח",
+          "transliteration": "lishko'ach",
+          "translation": "to forget",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "et",
+          "translation": "(direct object)",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הרגעים",
+          "transliteration": "hare'ga'im",
+          "translation": "the moments",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שם",
+          "transliteration": "sham",
+          "translation": "there",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "on",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "החוף",
+          "transliteration": "hachof",
+          "translation": "the shore",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בלב",
+          "transliteration": "belev",
+          "translation": "in heart",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ים",
+          "transliteration": "yam",
+          "translation": "sea",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קשור",
+          "transliteration": "kashur",
+          "translation": "connected",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לך",
+          "transliteration": "lecha",
+          "translation": "to you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "למה",
+          "transliteration": "lema",
+          "translation": "to what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שאני",
+          "transliteration": "she'ani",
+          "translation": "that I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מרגיש",
+          "transliteration": "margish",
+          "translation": "feeling",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אבל",
+          "transliteration": "aval",
+          "translation": "but",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכל",
+          "transliteration": "hakol",
+          "translation": "everything",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קשור",
+          "transliteration": "kashur",
+          "translation": "connected",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לסיני",
+          "transliteration": "leSinai",
+          "translation": "to Sinai",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלי",
+          "transliteration": "sheli",
+          "translation": "my",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שם",
+          "transliteration": "sham",
+          "translation": "there",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "השארתי",
+          "transliteration": "hisharti",
+          "translation": "I left behind",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חלק",
+          "transliteration": "chelek",
+          "translation": "a part",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מעצמי",
+          "transliteration": "me'atzmi",
+          "translation": "of myself",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "ma-yadu'a",
+    "title": "מה ידוע על היום הזה",
+    "titleTranslit": "Ma Yadu'a Al HaYom HaZe",
+    "titleEn": "What Is Known About This Day",
+    "artist": "מאור כהן",
+    "artistEn": "Maor Cohen",
+    "year": 2000,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#6e8c4a",
+    "lines": [
+      [
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ידוע",
+          "transliteration": "yadu'a",
+          "translation": "is known",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "about",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "היום",
+          "transliteration": "hayom",
+          "translation": "the day",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הזה",
+          "transliteration": "haze",
+          "translation": "this",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שהכל",
+          "transliteration": "shehakol",
+          "translation": "that everything",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ישתנה",
+          "transliteration": "yishtane",
+          "translation": "will change",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לפתע",
+          "transliteration": "lefeta",
+          "translation": "suddenly",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ידוע",
+          "transliteration": "yadu'a",
+          "translation": "is known",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "about",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הרגע",
+          "transliteration": "harega",
+          "translation": "the moment",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הזה",
+          "transliteration": "haze",
+          "translation": "this",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שהוא",
+          "transliteration": "shehu",
+          "translation": "that it",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יחזור",
+          "transliteration": "yachzor",
+          "translation": "will return",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עוד",
+          "transliteration": "od",
+          "translation": "again",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אז",
+          "transliteration": "az",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תאחז",
+          "transliteration": "te'echoz",
+          "translation": "hold onto",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בו",
+          "transliteration": "bo",
+          "translation": "it",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בשתי",
+          "transliteration": "bishtey",
+          "translation": "with both",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ידיים",
+          "transliteration": "yadayim",
+          "translation": "hands",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואל",
+          "transliteration": "ve'al",
+          "translation": "and don't",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תרפה",
+          "transliteration": "tirpe",
+          "translation": "let go",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לעולם",
+          "transliteration": "le'olam",
+          "translation": "ever",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "hachi-yafe",
+    "title": "הכי יפה בעולם",
+    "titleTranslit": "Hachi Yafe Ba'Olam",
+    "titleEn": "The Most Beautiful in the World",
+    "artist": "מאור כהן",
+    "artistEn": "Maor Cohen",
+    "year": 2002,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#e8c4a0",
+    "lines": [
+      [
+        {
+          "hebrew": "את",
+          "transliteration": "at",
+          "translation": "you (f)",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכי",
+          "transliteration": "hachi",
+          "translation": "the most",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יפה",
+          "transliteration": "yafa",
+          "translation": "beautiful",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בעולם",
+          "transliteration": "ba'olam",
+          "translation": "in the world",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כשאת",
+          "transliteration": "keshe'at",
+          "translation": "when you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מחייכת",
+          "transliteration": "mechayyechet",
+          "translation": "are smiling",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אליי",
+          "transliteration": "elay",
+          "translation": "at me",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מרגיש",
+          "transliteration": "margish",
+          "translation": "feel",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שיש",
+          "transliteration": "sheyesh",
+          "translation": "that there is",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לי",
+          "transliteration": "li",
+          "translation": "for me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכל",
+          "transliteration": "hakol",
+          "translation": "everything",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הכי",
+          "transliteration": "hachi",
+          "translation": "the most",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יפה",
+          "transliteration": "yafa",
+          "translation": "beautiful",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בעולם",
+          "transliteration": "ba'olam",
+          "translation": "in the world",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "זאת",
+          "transliteration": "zot",
+          "translation": "this is",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "at",
+          "translation": "you",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "צריך",
+          "transliteration": "tzarich",
+          "translation": "need",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יותר",
+          "transliteration": "yoter",
+          "translation": "more",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מאת",
+          "transliteration": "me'at",
+          "translation": "than you",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הכי",
+          "transliteration": "hachi",
+          "translation": "the most",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יפה",
+          "transliteration": "yafa",
+          "translation": "beautiful",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שיש",
+          "transliteration": "sheyesh",
+          "translation": "there is",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "sof-onat-hatapuzim",
+    "title": "סוף עונת התפוזים",
+    "titleTranslit": "Sof Onat HaTapuzim",
+    "titleEn": "End of the Orange Season",
+    "artist": "תמוז",
+    "artistEn": "Tamuz",
+    "year": 1986,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#e87d20",
+    "lines": [
+      [
+        {
+          "hebrew": "סוף",
+          "transliteration": "sof",
+          "translation": "end",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עונת",
+          "transliteration": "onat",
+          "translation": "of the season",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "התפוזים",
+          "transliteration": "hatapuzim",
+          "translation": "of the oranges",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כבר",
+          "transliteration": "kvar",
+          "translation": "already",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קר",
+          "transliteration": "kar",
+          "translation": "cold",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ועצוב",
+          "transliteration": "ve'atzuv",
+          "translation": "and sad",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בחוץ",
+          "transliteration": "bachutz",
+          "translation": "outside",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יושב",
+          "transliteration": "yoshev",
+          "translation": "sitting",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פה",
+          "transliteration": "po",
+          "translation": "here",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לבד",
+          "transliteration": "levad",
+          "translation": "alone",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ומחכה",
+          "transliteration": "umechake",
+          "translation": "and waiting",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לך",
+          "transliteration": "lecha",
+          "translation": "for you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שתחזרי",
+          "transliteration": "shetachzeri",
+          "translation": "that you'll return",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הגנים",
+          "transliteration": "haganim",
+          "translation": "the gardens",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כבר",
+          "transliteration": "kvar",
+          "translation": "already",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נרדמו",
+          "transliteration": "nirdemu",
+          "translation": "fell asleep",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "והעצים",
+          "transliteration": "veha'etzim",
+          "translation": "and the trees",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עמדו",
+          "transliteration": "amdu",
+          "translation": "stood",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ריקים",
+          "transliteration": "rekim",
+          "translation": "empty",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "סוף",
+          "transliteration": "sof",
+          "translation": "end",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עונת",
+          "transliteration": "onat",
+          "translation": "of the season",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "התפוזים",
+          "transliteration": "hatapuzim",
+          "translation": "of the oranges",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לבד",
+          "transliteration": "levad",
+          "translation": "alone",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "seder-olami-chadash",
+    "title": "סדר עולמי חדש",
+    "titleTranslit": "Seder Olami Chadash",
+    "titleEn": "New World Order",
+    "artist": "החברים של נטשה",
+    "artistEn": "HaChaverim shel Natasha",
+    "year": 1995,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#4a2d6e",
+    "lines": [
+      [
+        {
+          "hebrew": "יש",
+          "transliteration": "yesh",
+          "translation": "there is",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "סדר",
+          "transliteration": "seder",
+          "translation": "order",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עולמי",
+          "transliteration": "olami",
+          "translation": "world",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חדש",
+          "transliteration": "chadash",
+          "translation": "new",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שאוחז",
+          "transliteration": "she'ochaz",
+          "translation": "that grips",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בכל",
+          "transliteration": "bakol",
+          "translation": "in everything",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שיש",
+          "transliteration": "sheyesh",
+          "translation": "there is",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אנחנו",
+          "transliteration": "anachnu",
+          "translation": "we",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רצינו",
+          "transliteration": "ratzinu",
+          "translation": "wanted",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "משהו",
+          "transliteration": "mashehu",
+          "translation": "something",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אחר",
+          "transliteration": "acher",
+          "translation": "different",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "משהו",
+          "transliteration": "mashehu",
+          "translation": "something",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שהוא",
+          "transliteration": "shehu",
+          "translation": "that is",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלנו",
+          "transliteration": "shelanu",
+          "translation": "ours",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "סדר",
+          "transliteration": "seder",
+          "translation": "order",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עולמי",
+          "transliteration": "olami",
+          "translation": "world",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חדש",
+          "transliteration": "chadash",
+          "translation": "new",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "תן",
+          "transliteration": "ten",
+          "translation": "give",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לי",
+          "transliteration": "li",
+          "translation": "me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לחיות",
+          "transliteration": "lichyot",
+          "translation": "to live",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בו",
+          "transliteration": "bo",
+          "translation": "in it",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "od-negi'a",
+    "title": "עוד נגיעה",
+    "titleTranslit": "Od Negi'a",
+    "titleEn": "One More Touch",
+    "artist": "החברים של נטשה",
+    "artistEn": "HaChaverim shel Natasha",
+    "year": 1997,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#c84a6e",
+    "lines": [
+      [
+        {
+          "hebrew": "עוד",
+          "transliteration": "od",
+          "translation": "one more",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נגיעה",
+          "transliteration": "negi'a",
+          "translation": "touch",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ועוד",
+          "transliteration": "ve'od",
+          "translation": "and one more",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נגיעה",
+          "transliteration": "negi'a",
+          "translation": "touch",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "every",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פעם",
+          "transliteration": "pa'am",
+          "translation": "time",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכל",
+          "transliteration": "hakol",
+          "translation": "everything",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מחדש",
+          "transliteration": "mechadash",
+          "translation": "anew",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ידייך",
+          "transliteration": "yadayich",
+          "translation": "your hands",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "on",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עורי",
+          "transliteration": "ori",
+          "translation": "my skin",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ועיניייך",
+          "transliteration": "ve'einayich",
+          "translation": "and your eyes",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שואלות",
+          "transliteration": "sho'alot",
+          "translation": "asking",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אם",
+          "transliteration": "im",
+          "translation": "if",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כאן",
+          "transliteration": "kan",
+          "translation": "here",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "עוד",
+          "transliteration": "od",
+          "translation": "still",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נגיעה",
+          "transliteration": "negi'a",
+          "translation": "touch",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אחת",
+          "transliteration": "achat",
+          "translation": "one",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נשאר",
+          "transliteration": "nish'ar",
+          "translation": "stay",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "איתך",
+          "transliteration": "itach",
+          "translation": "with you",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "al-kav-hazinuk",
+    "title": "על קו הזינוק",
+    "titleTranslit": "Al Kav HaZinuk",
+    "titleEn": "On the Starting Line",
+    "artist": "החברים של נטשה",
+    "artistEn": "HaChaverim shel Natasha",
+    "year": 1998,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#2d6e4a",
+    "lines": [
+      [
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "on",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קו",
+          "transliteration": "kav",
+          "translation": "the line",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הזינוק",
+          "transliteration": "hazinuk",
+          "translation": "of the start",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "עומד",
+          "transliteration": "omed",
+          "translation": "standing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ומחכה",
+          "transliteration": "umechake",
+          "translation": "and waiting",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לאות",
+          "transliteration": "le'ot",
+          "translation": "for the signal",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הלב",
+          "transliteration": "halev",
+          "translation": "the heart",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פועם",
+          "transliteration": "po'em",
+          "translation": "beats",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חזק",
+          "transliteration": "chazak",
+          "translation": "strong",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מוכן",
+          "transliteration": "muchan",
+          "translation": "ready",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לרוץ",
+          "transliteration": "larutz",
+          "translation": "to run",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "on",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קו",
+          "transliteration": "kav",
+          "translation": "the line",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הזינוק",
+          "transliteration": "hazinuk",
+          "translation": "of the start",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הגדול",
+          "transliteration": "hagadol",
+          "translation": "the great",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "all",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "החיים",
+          "transliteration": "hachayim",
+          "translation": "life",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לפניי",
+          "transliteration": "lefanay",
+          "translation": "before me",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "shemesh-shemesh",
+    "title": "שמש שמש",
+    "titleTranslit": "Shemesh Shemesh",
+    "titleEn": "Sun Sun",
+    "artist": "אריאל זילבר",
+    "artistEn": "Ariel Zilber",
+    "year": 1978,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#e8c420",
+    "lines": [
+      [
+        {
+          "hebrew": "שמש",
+          "transliteration": "shemesh",
+          "translation": "sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמש",
+          "transliteration": "shemesh",
+          "translation": "sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אתה",
+          "transliteration": "ata",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שורף",
+          "transliteration": "soref",
+          "translation": "burning",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "every",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יום",
+          "transliteration": "yom",
+          "translation": "day",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אתה",
+          "transliteration": "ata",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עולה",
+          "transliteration": "ole",
+          "translation": "rise",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ומחמם",
+          "transliteration": "umechamem",
+          "translation": "and warming",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "et",
+          "translation": "the",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכל",
+          "transliteration": "hakol",
+          "translation": "everything",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שמש",
+          "transliteration": "shemesh",
+          "translation": "sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמש",
+          "transliteration": "shemesh",
+          "translation": "sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תזרח",
+          "transliteration": "tizrach",
+          "translation": "shine",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לי",
+          "transliteration": "li",
+          "translation": "for me",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ללא",
+          "transliteration": "lelo",
+          "translation": "without",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אורך",
+          "transliteration": "oracha",
+          "translation": "your light",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קר",
+          "transliteration": "kar",
+          "translation": "cold",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שמש",
+          "transliteration": "shemesh",
+          "translation": "sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמש",
+          "transliteration": "shemesh",
+          "translation": "sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אל",
+          "transliteration": "al",
+          "translation": "don't",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תשקע",
+          "transliteration": "tishka",
+          "translation": "set",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "aduma-sheli",
+    "title": "אדומה שלי",
+    "titleTranslit": "Aduma Sheli",
+    "titleEn": "My Red One",
+    "artist": "אריק איינשטיין",
+    "artistEn": "Arik Einstein",
+    "year": 1974,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#c82020",
+    "lines": [
+      [
+        {
+          "hebrew": "אדומה",
+          "transliteration": "aduma",
+          "translation": "red one",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלי",
+          "transliteration": "sheli",
+          "translation": "my",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכי",
+          "transliteration": "hachi",
+          "translation": "the most",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יפה",
+          "transliteration": "yafa",
+          "translation": "beautiful",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בעולם",
+          "transliteration": "ba'olam",
+          "translation": "in the world",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כשאני",
+          "transliteration": "kshe'ani",
+          "translation": "when I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רואה",
+          "transliteration": "ro'e",
+          "translation": "see",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותה",
+          "transliteration": "ota",
+          "translation": "her",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הלב",
+          "transliteration": "halev",
+          "translation": "the heart",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמח",
+          "transliteration": "same'ach",
+          "translation": "happy",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אדומה",
+          "transliteration": "aduma",
+          "translation": "red one",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלי",
+          "transliteration": "sheli",
+          "translation": "my",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אהבה",
+          "transliteration": "ahava",
+          "translation": "love",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלי",
+          "transliteration": "sheli",
+          "translation": "my",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אתה",
+          "transliteration": "ata",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מבין",
+          "transliteration": "mevin",
+          "translation": "understand",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "זה",
+          "transliteration": "ze",
+          "translation": "this",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אהבה",
+          "transliteration": "ahava",
+          "translation": "love",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "זה",
+          "transliteration": "ze",
+          "translation": "this",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כשהיא",
+          "transliteration": "kshehi",
+          "translation": "when she",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כולה",
+          "transliteration": "kula",
+          "translation": "all",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלך",
+          "transliteration": "shelcha",
+          "translation": "yours",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "bchevra-lehagant-hateva",
+    "title": "בחברה להגנת הטבע",
+    "titleTranslit": "BaChevra LeHaganat HaTeva",
+    "titleEn": "In the Society for Nature Protection",
+    "artist": "אריאל זילבר",
+    "artistEn": "Ariel Zilber",
+    "year": 1976,
+    "genre": "פולק",
+    "genreEn": "Folk",
+    "spotifyId": null,
+    "coverColor": "#2d6e20",
+    "lines": [
+      [
+        {
+          "hebrew": "בחברה",
+          "transliteration": "bachevra",
+          "translation": "in the society",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "להגנת",
+          "transliteration": "lehaganat",
+          "translation": "for the protection",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הטבע",
+          "transliteration": "hateva",
+          "translation": "of nature",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "יושבים",
+          "transliteration": "yoshvim",
+          "translation": "sitting",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אנשים",
+          "transliteration": "anashim",
+          "translation": "people",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "טובים",
+          "transliteration": "tovim",
+          "translation": "good",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שאוהבים",
+          "transliteration": "she'ohavim",
+          "translation": "who love",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "et",
+          "translation": "the",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הארץ",
+          "transliteration": "ha'aretz",
+          "translation": "the land",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ורוצים",
+          "transliteration": "verotzim",
+          "translation": "and want",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לשמור",
+          "transliteration": "lishmor",
+          "translation": "to protect",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עליה",
+          "transliteration": "aleyha",
+          "translation": "it",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "השדות",
+          "transliteration": "hasadot",
+          "translation": "the fields",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "והיערות",
+          "transliteration": "vehaye'arot",
+          "translation": "and the forests",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הנחלים",
+          "transliteration": "hanechalim",
+          "translation": "the streams",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "והגבעות",
+          "transliteration": "vehagivot",
+          "translation": "and the hills",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כולם",
+          "transliteration": "kulam",
+          "translation": "all of them",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "צריכים",
+          "transliteration": "tzrichim",
+          "translation": "need",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הגנה",
+          "transliteration": "hagana",
+          "translation": "protection",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "yatzanu-lirkod",
+    "title": "יצאנו לרקוד",
+    "titleTranslit": "Yatzanu Lirkod",
+    "titleEn": "We Went Out to Dance",
+    "artist": "הדורבנים",
+    "artistEn": "HaDorbanim",
+    "year": 1980,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#6e204a",
+    "lines": [
+      [
+        {
+          "hebrew": "יצאנו",
+          "transliteration": "yatzanu",
+          "translation": "we went out",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לרקוד",
+          "transliteration": "lirkod",
+          "translation": "to dance",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הלילה",
+          "transliteration": "halayla",
+          "translation": "tonight",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כולנו",
+          "transliteration": "kulanu",
+          "translation": "all of us",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ביחד",
+          "transliteration": "beyachad",
+          "translation": "together",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שם",
+          "transliteration": "sham",
+          "translation": "there",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "המוסיקה",
+          "transliteration": "hamusika",
+          "translation": "the music",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מנגנת",
+          "transliteration": "menagenet",
+          "translation": "playing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ורמה",
+          "transliteration": "verama",
+          "translation": "and loud",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "יצאנו",
+          "transliteration": "yatzanu",
+          "translation": "we went out",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לרקוד",
+          "transliteration": "lirkod",
+          "translation": "to dance",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ולא",
+          "transliteration": "velo",
+          "translation": "and not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נחזור",
+          "transliteration": "nachzor",
+          "translation": "will return",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הביתה",
+          "transliteration": "habayta",
+          "translation": "home",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "עד",
+          "transliteration": "ad",
+          "translation": "until",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שהשמש",
+          "transliteration": "shehashemesh",
+          "translation": "the sun",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תעלה",
+          "transliteration": "ta'ale",
+          "translation": "rises",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "rutzi-shmulik",
+    "title": "רוצי שמוליק",
+    "titleTranslit": "Rutzi Shmulik",
+    "titleEn": "Run Shmulik",
+    "artist": "אריאל זילבר",
+    "artistEn": "Ariel Zilber",
+    "year": 1979,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#4a6e8c",
+    "lines": [
+      [
+        {
+          "hebrew": "רוצי",
+          "transliteration": "rutzi",
+          "translation": "run",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמוליק",
+          "transliteration": "shmulik",
+          "translation": "Shmulik",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רוצי",
+          "transliteration": "rutzi",
+          "translation": "run",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אל",
+          "transliteration": "el",
+          "translation": "to",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תשב",
+          "transliteration": "teshev",
+          "translation": "don't sit",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "במקומך",
+          "transliteration": "bimkomcha",
+          "translation": "in your place",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "רוצי",
+          "transliteration": "rutzi",
+          "translation": "run",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמוליק",
+          "transliteration": "shmulik",
+          "translation": "Shmulik",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מהר",
+          "transliteration": "maher",
+          "translation": "fast",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הזמן",
+          "transliteration": "hazman",
+          "translation": "the time",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עובר",
+          "transliteration": "over",
+          "translation": "passes",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "החיים",
+          "transliteration": "hachayim",
+          "translation": "life",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הם",
+          "transliteration": "hem",
+          "translation": "are",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מרוץ",
+          "transliteration": "merotz",
+          "translation": "a race",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "רוצי",
+          "transliteration": "rutzi",
+          "translation": "run",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמוליק",
+          "transliteration": "shmulik",
+          "translation": "Shmulik",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רוצי",
+          "transliteration": "rutzi",
+          "translation": "run",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "shuv-hadisco-kan",
+    "title": "שוב הדיסקו כאן",
+    "titleTranslit": "Shuv HaDisco Kan",
+    "titleEn": "The Disco Is Back",
+    "artist": "הדורבנים",
+    "artistEn": "HaDorbanim",
+    "year": 1978,
+    "genre": "פופ-דיסקו",
+    "genreEn": "Pop-Disco",
+    "spotifyId": null,
+    "coverColor": "#8c4a6e",
+    "lines": [
+      [
+        {
+          "hebrew": "שוב",
+          "transliteration": "shuv",
+          "translation": "again",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הדיסקו",
+          "transliteration": "hadisko",
+          "translation": "the disco",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כאן",
+          "transliteration": "kan",
+          "translation": "here",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כולם",
+          "transliteration": "kulam",
+          "translation": "everyone",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רוקדים",
+          "transliteration": "rokdim",
+          "translation": "dancing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שוב",
+          "transliteration": "shuv",
+          "translation": "again",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "האורות",
+          "transliteration": "ha'orot",
+          "translation": "the lights",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מהבהבים",
+          "transliteration": "mehabhavim",
+          "translation": "flashing",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "והמוסיקה",
+          "transliteration": "vehamus'ika",
+          "translation": "and the music",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מנגנת",
+          "transliteration": "menagenet",
+          "translation": "playing",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שוב",
+          "transliteration": "shuv",
+          "translation": "again",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הדיסקו",
+          "transliteration": "hadisko",
+          "translation": "the disco",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כאן",
+          "transliteration": "kan",
+          "translation": "here",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "בוא",
+          "transliteration": "bo",
+          "translation": "come",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נרקוד",
+          "transliteration": "nirkod",
+          "translation": "let's dance",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "all",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הלילה",
+          "transliteration": "halayla",
+          "translation": "the night",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "ma-kara-lecha",
+    "title": "מה קרה לך",
+    "titleTranslit": "Ma Kara Lecha",
+    "titleEn": "What Happened to You",
+    "artist": "שוטי הנבואה",
+    "artistEn": "Shotei HaNevua",
+    "year": 1995,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#2d2d6e",
+    "lines": [
+      [
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קרה",
+          "transliteration": "kara",
+          "translation": "happened",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לך",
+          "transliteration": "lecha",
+          "translation": "to you",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מכיר",
+          "transliteration": "makir",
+          "translation": "recognize",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותך",
+          "transliteration": "otcha",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יותר",
+          "transliteration": "yoter",
+          "translation": "anymore",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "איפה",
+          "transliteration": "eyfo",
+          "translation": "where",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "האדם",
+          "transliteration": "ha'adam",
+          "translation": "the person",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שהכרתי",
+          "transliteration": "shehekarti",
+          "translation": "that I knew",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קרה",
+          "transliteration": "kara",
+          "translation": "happened",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לך",
+          "transliteration": "lecha",
+          "translation": "to you",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "פעם",
+          "transliteration": "pa'am",
+          "translation": "once",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "היית",
+          "transliteration": "hayita",
+          "translation": "you were",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חופשי",
+          "transliteration": "chofshi",
+          "translation": "free",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "עכשיו",
+          "transliteration": "achshav",
+          "translation": "now",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אתה",
+          "transliteration": "ata",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כלוא",
+          "transliteration": "kalu'a",
+          "translation": "trapped",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בפנים",
+          "transliteration": "bifnim",
+          "translation": "inside",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "hayladim-koftzim",
+    "title": "הילדים קופצים",
+    "titleTranslit": "HaYeladim Koftzim",
+    "titleEn": "The Children Are Jumping",
+    "artist": "שוטי הנבואה",
+    "artistEn": "Shotei HaNevua",
+    "year": 1997,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#6e6e20",
+    "lines": [
+      [
+        {
+          "hebrew": "הילדים",
+          "transliteration": "hayeladim",
+          "translation": "the children",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קופצים",
+          "transliteration": "koftzim",
+          "translation": "jumping",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בחוץ",
+          "transliteration": "bachutz",
+          "translation": "outside",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אין",
+          "transliteration": "ein",
+          "translation": "there is no",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "להם",
+          "transliteration": "lahem",
+          "translation": "for them",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "דאגות",
+          "transliteration": "de'agot",
+          "translation": "worries",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "צוחקים",
+          "transliteration": "tzochakim",
+          "translation": "laughing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ורצים",
+          "transliteration": "verutzim",
+          "translation": "and running",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בשדות",
+          "transliteration": "basadot",
+          "translation": "in the fields",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הילדים",
+          "transliteration": "hayeladim",
+          "translation": "the children",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קופצים",
+          "transliteration": "koftzim",
+          "translation": "jumping",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כך",
+          "transliteration": "kach",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "גם",
+          "transliteration": "gam",
+          "translation": "also",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פעם",
+          "transliteration": "pa'am",
+          "translation": "once",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הייתי",
+          "transliteration": "hayiti",
+          "translation": "was",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אחד",
+          "transliteration": "echad",
+          "translation": "one",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מהם",
+          "transliteration": "mehem",
+          "translation": "of them",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "panan",
+    "title": "פאנן",
+    "titleTranslit": "Panan",
+    "titleEn": "Panan",
+    "artist": "שוטי הנבואה",
+    "artistEn": "Shotei HaNevua",
+    "year": 1999,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#6e2d20",
+    "lines": [
+      [
+        {
+          "hebrew": "פאנן",
+          "transliteration": "panan",
+          "translation": "Panan",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פאנן",
+          "transliteration": "panan",
+          "translation": "Panan",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אתה",
+          "transliteration": "ata",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רוצה",
+          "transliteration": "rotze",
+          "translation": "want",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יכול",
+          "transliteration": "yachol",
+          "translation": "can",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לתת",
+          "transliteration": "latet",
+          "translation": "to give",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לך",
+          "transliteration": "lecha",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יותר",
+          "transliteration": "yoter",
+          "translation": "more",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "פאנן",
+          "transliteration": "panan",
+          "translation": "Panan",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לך",
+          "transliteration": "lech",
+          "translation": "go",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הביתה",
+          "transliteration": "habayta",
+          "translation": "home",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כאן",
+          "transliteration": "kan",
+          "translation": "here",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אין",
+          "transliteration": "ein",
+          "translation": "there is no",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לחפש",
+          "transliteration": "lechapes",
+          "translation": "to search",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "פאנן",
+          "transliteration": "panan",
+          "translation": "Panan",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פאנן",
+          "transliteration": "panan",
+          "translation": "Panan",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "so-far",
+    "title": "so far",
+    "titleTranslit": "So Far",
+    "titleEn": "So Far",
+    "artist": "הבנות נחמה",
+    "artistEn": "HaBanot Nechama",
+    "year": 2004,
+    "genre": "אינדי",
+    "genreEn": "Indie",
+    "spotifyId": null,
+    "coverColor": "#c8e0f0",
+    "lines": [
+      [
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "every",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כך",
+          "transliteration": "kach",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רחוק",
+          "transliteration": "rachok",
+          "translation": "far",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ממני",
+          "transliteration": "mimeni",
+          "translation": "from me",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עומדת",
+          "transliteration": "omedet",
+          "translation": "standing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "וצופה",
+          "transliteration": "vetzofah",
+          "translation": "and watching",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "so",
+          "transliteration": "so",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "far",
+          "transliteration": "far",
+          "translation": "far",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "away",
+          "transliteration": "away",
+          "translation": "away",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "every",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שרציתי",
+          "transliteration": "sheratziti",
+          "translation": "I wanted",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "עכשיו",
+          "transliteration": "achshav",
+          "translation": "now",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נראה",
+          "transliteration": "nir'e",
+          "translation": "seems",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רחוק",
+          "transliteration": "rachok",
+          "translation": "far",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כך",
+          "transliteration": "kach",
+          "translation": "very",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רחוק",
+          "transliteration": "rachok",
+          "translation": "far",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "tagidi-li-et",
+    "title": "תגידי לי את",
+    "titleTranslit": "Tagidi Li Et",
+    "titleEn": "Tell Me You",
+    "artist": "מרצדס בנד",
+    "artistEn": "Mercedes Band",
+    "year": 1990,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#1a1a4a",
+    "lines": [
+      [
+        {
+          "hebrew": "תגידי",
+          "transliteration": "tagidi",
+          "translation": "tell me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לי",
+          "transliteration": "li",
+          "translation": "to me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "et",
+          "translation": "you (f)",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "at",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חושבת",
+          "transliteration": "choshevet",
+          "translation": "thinking",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עליי",
+          "transliteration": "alay",
+          "translation": "about me",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "תגידי",
+          "transliteration": "tagidi",
+          "translation": "tell me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לי",
+          "transliteration": "li",
+          "translation": "to me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "האמת",
+          "transliteration": "ha'emet",
+          "translation": "the truth",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מוכן",
+          "transliteration": "muchan",
+          "translation": "ready",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לשמוע",
+          "transliteration": "lishmoa",
+          "translation": "to hear",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "תגידי",
+          "transliteration": "tagidi",
+          "translation": "tell me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לי",
+          "transliteration": "li",
+          "translation": "to me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "et",
+          "translation": "you (f)",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בלייך",
+          "transliteration": "bilayich",
+          "translation": "without you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלם",
+          "transliteration": "shalem",
+          "translation": "complete",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "shnitzelim",
+    "title": "שניצלים",
+    "titleTranslit": "Shnitzelim",
+    "titleEn": "Schnitzels",
+    "artist": "טונה",
+    "artistEn": "Tuna",
+    "year": 2000,
+    "genre": "רוק-קומדי",
+    "genreEn": "Rock-Comedy",
+    "spotifyId": null,
+    "coverColor": "#c8a020",
+    "lines": [
+      [
+        {
+          "hebrew": "שניצלים",
+          "transliteration": "shnitzelim",
+          "translation": "schnitzels",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שניצלים",
+          "transliteration": "shnitzelim",
+          "translation": "schnitzels",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אוכלים",
+          "transliteration": "ochlim",
+          "translation": "eating",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שניצלים",
+          "transliteration": "shnitzelim",
+          "translation": "schnitzels",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "every",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יום",
+          "transliteration": "yom",
+          "translation": "day",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "בבוקר",
+          "transliteration": "baboker",
+          "translation": "in the morning",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שניצל",
+          "transliteration": "shnitzel",
+          "translation": "schnitzel",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "בצהריים",
+          "transliteration": "batzohoriim",
+          "translation": "at noon",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שניצל",
+          "transliteration": "shnitzel",
+          "translation": "schnitzel",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "בערב",
+          "transliteration": "ba'erev",
+          "translation": "in the evening",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שניצל",
+          "transliteration": "shnitzel",
+          "translation": "schnitzel",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואחרי",
+          "transliteration": "ve'acharey",
+          "translation": "and after",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "all",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "זה",
+          "transliteration": "ze",
+          "translation": "this",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עוד",
+          "transliteration": "od",
+          "translation": "still",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שניצל",
+          "transliteration": "shnitzel",
+          "translation": "schnitzel",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "hi-kol-kach-yafa",
+    "title": "היא כל כך יפה",
+    "titleTranslit": "Hi Kol Kach Yafa",
+    "titleEn": "She Is So Beautiful",
+    "artist": "כוורת",
+    "artistEn": "Kaveret",
+    "year": 1973,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#e8e020",
+    "lines": [
+      [
+        {
+          "hebrew": "היא",
+          "transliteration": "hi",
+          "translation": "she",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כך",
+          "transliteration": "kach",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יפה",
+          "transliteration": "yafa",
+          "translation": "beautiful",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "עיניה",
+          "transliteration": "eyneyha",
+          "translation": "her eyes",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כמו",
+          "transliteration": "kmo",
+          "translation": "like",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ים",
+          "transliteration": "yam",
+          "translation": "sea",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שפתיה",
+          "transliteration": "sfateyha",
+          "translation": "her lips",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אדומות",
+          "transliteration": "adumot",
+          "translation": "red",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ולבה",
+          "transliteration": "velibbah",
+          "translation": "and her heart",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פתוח",
+          "transliteration": "patu'ach",
+          "translation": "open",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "היא",
+          "transliteration": "hi",
+          "translation": "she",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כך",
+          "transliteration": "kach",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יפה",
+          "transliteration": "yafa",
+          "translation": "beautiful",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כך",
+          "transliteration": "kach",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אוהב",
+          "transliteration": "ohev",
+          "translation": "love",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותה",
+          "transliteration": "ota",
+          "translation": "her",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "golyat",
+    "title": "גוליית",
+    "titleTranslit": "Golyat",
+    "titleEn": "Goliath",
+    "artist": "כוורת",
+    "artistEn": "Kaveret",
+    "year": 1973,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#4a4a4a",
+    "lines": [
+      [
+        {
+          "hebrew": "גוליית",
+          "transliteration": "golyat",
+          "translation": "Goliath",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "היה",
+          "transliteration": "haya",
+          "translation": "was",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "גבוה",
+          "transliteration": "gavo'ah",
+          "translation": "tall",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כמו",
+          "transliteration": "kmo",
+          "translation": "like",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עץ",
+          "transliteration": "etz",
+          "translation": "a tree",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בשדה",
+          "transliteration": "basade",
+          "translation": "in the field",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ודוד",
+          "transliteration": "vedavid",
+          "translation": "and David",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הקטן",
+          "transliteration": "hakatan",
+          "translation": "the small",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בא",
+          "transliteration": "ba",
+          "translation": "came",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "עם",
+          "transliteration": "im",
+          "translation": "with",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אבן",
+          "transliteration": "even",
+          "translation": "a stone",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ביד",
+          "transliteration": "beyad",
+          "translation": "in hand",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "גוליית",
+          "transliteration": "golyat",
+          "translation": "Goliath",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "האמין",
+          "transliteration": "he'emin",
+          "translation": "believed",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שאפשר",
+          "transliteration": "she'efshar",
+          "translation": "that it's possible",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "להפיל",
+          "transliteration": "lehapil",
+          "translation": "to fell",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותו",
+          "transliteration": "oto",
+          "translation": "him",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "shir-hamakholet",
+    "title": "שיר המכולת",
+    "titleTranslit": "Shir HaMakolet",
+    "titleEn": "The Grocery Store Song",
+    "artist": "כוורת",
+    "artistEn": "Kaveret",
+    "year": 1974,
+    "genre": "רוק-קומדי",
+    "genreEn": "Rock-Comedy",
+    "spotifyId": null,
+    "coverColor": "#4a8c4a",
+    "lines": [
+      [
+        {
+          "hebrew": "בחנות",
+          "transliteration": "bachanut",
+          "translation": "in the store",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "המכולת",
+          "transliteration": "hamakolet",
+          "translation": "the grocery",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלי",
+          "transliteration": "sheli",
+          "translation": "my",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "יש",
+          "transliteration": "yesh",
+          "translation": "there is",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכל",
+          "transliteration": "hakol",
+          "translation": "everything",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שמן",
+          "transliteration": "shemen",
+          "translation": "oil",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "וסבון",
+          "transliteration": "vesavon",
+          "translation": "and soap",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "וקמח",
+          "transliteration": "vekemach",
+          "translation": "and flour",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לחם",
+          "transliteration": "lechem",
+          "translation": "bread",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "בוא",
+          "transliteration": "bo",
+          "translation": "come",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ניכנס",
+          "transliteration": "nikanes",
+          "translation": "let's enter",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פנימה",
+          "transliteration": "penima",
+          "translation": "inside",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ונקנה",
+          "transliteration": "nikne",
+          "translation": "and buy",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "משהו",
+          "transliteration": "mashehu",
+          "translation": "something",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "טעים",
+          "transliteration": "ta'im",
+          "translation": "tasty",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "adam-tzover-zichronot",
+    "title": "אדם צובר זכרונות",
+    "titleTranslit": "Adam Tzover Zichronot",
+    "titleEn": "A Person Accumulates Memories",
+    "artist": "אברהם טל",
+    "artistEn": "Avraham Tal",
+    "year": 2003,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#8c6e4a",
+    "lines": [
+      [
+        {
+          "hebrew": "אדם",
+          "transliteration": "adam",
+          "translation": "a person",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "צובר",
+          "transliteration": "tzover",
+          "translation": "accumulates",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "זכרונות",
+          "transliteration": "zichronot",
+          "translation": "memories",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "לאורך",
+          "transliteration": "le'orech",
+          "translation": "throughout",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כל",
+          "transliteration": "kol",
+          "translation": "all",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חייו",
+          "transliteration": "chayav",
+          "translation": "his life",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ורגעים",
+          "transliteration": "verega'im",
+          "translation": "and moments",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שהיו",
+          "transliteration": "shehay'u",
+          "translation": "that were",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "פעם",
+          "transliteration": "pa'am",
+          "translation": "once",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "נשארים",
+          "transliteration": "nish'arim",
+          "translation": "remain",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "איתו",
+          "transliteration": "ito",
+          "translation": "with him",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תמיד",
+          "transliteration": "tamid",
+          "translation": "always",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אדם",
+          "transliteration": "adam",
+          "translation": "a person",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "צובר",
+          "transliteration": "tzover",
+          "translation": "accumulates",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "זכרונות",
+          "transliteration": "zichronot",
+          "translation": "memories",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "וכל",
+          "transliteration": "vechol",
+          "translation": "and each",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "זכרון",
+          "transliteration": "zicharon",
+          "translation": "memory",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הוא",
+          "transliteration": "hu",
+          "translation": "is",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אוצר",
+          "transliteration": "otzar",
+          "translation": "a treasure",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "al-tarutz-rachok",
+    "title": "אל תרוץ רחוק מדי",
+    "titleTranslit": "Al Tarutz Rachok Miday",
+    "titleEn": "Don't Run Too Far",
+    "artist": "עלמה גוב",
+    "artistEn": "Alma Gov",
+    "year": 2005,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#c8c8e8",
+    "lines": [
+      [
+        {
+          "hebrew": "אל",
+          "transliteration": "al",
+          "translation": "don't",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תרוץ",
+          "transliteration": "tarutz",
+          "translation": "run",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רחוק",
+          "transliteration": "rachok",
+          "translation": "far",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מדי",
+          "transliteration": "miday",
+          "translation": "too much",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "צריכה",
+          "transliteration": "tzricha",
+          "translation": "need",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותך",
+          "transliteration": "otcha",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כאן",
+          "transliteration": "kan",
+          "translation": "here",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אל",
+          "transliteration": "al",
+          "translation": "don't",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תרוץ",
+          "transliteration": "tarutz",
+          "translation": "run",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "רחוק",
+          "transliteration": "rachok",
+          "translation": "far",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אחר",
+          "transliteration": "achar",
+          "translation": "after",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כך",
+          "transliteration": "kach",
+          "translation": "so",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אבדתי",
+          "transliteration": "avadeti",
+          "translation": "I am lost",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "תישאר",
+          "transliteration": "tisha'er",
+          "translation": "stay",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "איתי",
+          "transliteration": "iti",
+          "translation": "with me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עוד",
+          "transliteration": "od",
+          "translation": "a little",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קצת",
+          "transliteration": "ktzat",
+          "translation": "more",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "shir-leneta",
+    "title": "שיר לנטע",
+    "titleTranslit": "Shir LeNeta",
+    "titleEn": "A Song for Neta",
+    "artist": "ניר כנען",
+    "artistEn": "Nir Kna'an",
+    "year": 2008,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#e8c0d8",
+    "lines": [
+      [
+        {
+          "hebrew": "כתבתי",
+          "transliteration": "katavti",
+          "translation": "I wrote",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שיר",
+          "transliteration": "shir",
+          "translation": "a song",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לנטע",
+          "transliteration": "leNeta",
+          "translation": "for Neta",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אין",
+          "transliteration": "ein",
+          "translation": "there are no",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מילים",
+          "transliteration": "milim",
+          "translation": "words",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אחרות",
+          "transliteration": "acherot",
+          "translation": "other",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שיתארו",
+          "transliteration": "sheyeta'aru",
+          "translation": "to describe",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותה",
+          "transliteration": "ota",
+          "translation": "her",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כמו",
+          "transliteration": "kmo",
+          "translation": "like",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שהיא",
+          "transliteration": "shehi",
+          "translation": "she is",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שיר",
+          "transliteration": "shir",
+          "translation": "a song",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לנטע",
+          "transliteration": "leNeta",
+          "translation": "for Neta",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלי",
+          "transliteration": "sheli",
+          "translation": "my",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "האהבה",
+          "transliteration": "ha'ahava",
+          "translation": "the love",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכי",
+          "transliteration": "hachi",
+          "translation": "the greatest",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "גדולה",
+          "transliteration": "gdola",
+          "translation": "big",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שיש",
+          "transliteration": "sheyesh",
+          "translation": "there is",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "geshem-chazak",
+    "title": "גשם חזק",
+    "titleTranslit": "Geshem Chazak",
+    "titleEn": "Heavy Rain",
+    "artist": "מוניקה סקס",
+    "artistEn": "Monica Sex",
+    "year": 1998,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#2040c0",
+    "lines": [
+      [
+        {
+          "hebrew": "גשם",
+          "transliteration": "geshem",
+          "translation": "rain",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חזק",
+          "transliteration": "chazak",
+          "translation": "heavy",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יורד",
+          "transliteration": "yored",
+          "translation": "falling",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בחוץ",
+          "transliteration": "bachutz",
+          "translation": "outside",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יושב",
+          "transliteration": "yoshev",
+          "translation": "sitting",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ומסתכל",
+          "transliteration": "umistakkel",
+          "translation": "and watching",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הרחוב",
+          "transliteration": "harechov",
+          "translation": "the street",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שוטף",
+          "transliteration": "shotef",
+          "translation": "flooded",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "גשם",
+          "transliteration": "geshem",
+          "translation": "rain",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חזק",
+          "transliteration": "chazak",
+          "translation": "heavy",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "on",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "גגות",
+          "transliteration": "gagot",
+          "translation": "rooftops",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "רועם",
+          "transliteration": "ro'em",
+          "translation": "thundering",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ומרעיד",
+          "transliteration": "umara'id",
+          "translation": "and shaking",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הכל",
+          "transliteration": "hakol",
+          "translation": "everything",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "גשם",
+          "transliteration": "geshem",
+          "translation": "rain",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חזק",
+          "transliteration": "chazak",
+          "translation": "heavy",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כאן",
+          "transliteration": "kan",
+          "translation": "here",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "maka-afora",
+    "title": "מכה אפורה",
+    "titleTranslit": "Maka Afora",
+    "titleEn": "Gray Blow",
+    "artist": "מוניקה סקס",
+    "artistEn": "Monica Sex",
+    "year": 1999,
+    "genre": "רוק",
+    "genreEn": "Rock",
+    "spotifyId": null,
+    "coverColor": "#808080",
+    "lines": [
+      [
+        {
+          "hebrew": "מכה",
+          "transliteration": "maka",
+          "translation": "blow",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אפורה",
+          "transliteration": "afora",
+          "translation": "gray",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בלב",
+          "transliteration": "balev",
+          "translation": "in the heart",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "והכל",
+          "transliteration": "vehakol",
+          "translation": "and everything",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נראה",
+          "transliteration": "nir'e",
+          "translation": "looks",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אפור",
+          "transliteration": "afur",
+          "translation": "gray",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "שמיים",
+          "transliteration": "shamayim",
+          "translation": "sky",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אפורים",
+          "transliteration": "afurim",
+          "translation": "gray",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מחשבות",
+          "transliteration": "machshavot",
+          "translation": "thoughts",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אפורות",
+          "transliteration": "afurot",
+          "translation": "gray",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מכה",
+          "transliteration": "maka",
+          "translation": "blow",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אפורה",
+          "transliteration": "afora",
+          "translation": "gray",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "על",
+          "transliteration": "al",
+          "translation": "on",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הראש",
+          "transliteration": "harosh",
+          "translation": "the head",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ואני",
+          "transliteration": "va'ani",
+          "translation": "and I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מבין",
+          "transliteration": "mevin",
+          "translation": "understand",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "למה",
+          "transliteration": "lama",
+          "translation": "why",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "malach",
+    "title": "מלאך",
+    "titleTranslit": "Malach",
+    "titleEn": "Angel",
+    "artist": "מרצדס בנד",
+    "artistEn": "Mercedes Band",
+    "year": 1992,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#e8e8e8",
+    "lines": [
+      [
+        {
+          "hebrew": "מלאך",
+          "transliteration": "malach",
+          "translation": "angel",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קטן",
+          "transliteration": "katan",
+          "translation": "small",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ירד",
+          "transliteration": "yarad",
+          "translation": "descended",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מהשמים",
+          "transliteration": "mehashamayim",
+          "translation": "from the sky",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "ונגע",
+          "transliteration": "venaga",
+          "translation": "and touched",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בי",
+          "transliteration": "bi",
+          "translation": "me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ברגע",
+          "transliteration": "barega",
+          "translation": "at the moment",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "הנכון",
+          "transliteration": "hanachon",
+          "translation": "right",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מלאך",
+          "transliteration": "malach",
+          "translation": "angel",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שלי",
+          "transliteration": "sheli",
+          "translation": "my",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אתה",
+          "transliteration": "ata",
+          "translation": "you",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "שמרת",
+          "transliteration": "shamart",
+          "translation": "protected",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "עליי",
+          "transliteration": "alay",
+          "translation": "me",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תמיד",
+          "transliteration": "tamid",
+          "translation": "always",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "מלאך",
+          "transliteration": "malach",
+          "translation": "angel",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "קטן",
+          "transliteration": "katan",
+          "translation": "small",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אל",
+          "transliteration": "al",
+          "translation": "don't",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תעוף",
+          "transliteration": "ta'uf",
+          "translation": "fly away",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "הישאר",
+          "transliteration": "hisha'er",
+          "translation": "stay",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "כאן",
+          "transliteration": "kan",
+          "translation": "here",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "איתי",
+          "transliteration": "iti",
+          "translation": "with me",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "kama-ani-ohev-otach",
+    "title": "כמה אני אוהב אותך",
+    "titleTranslit": "Kama Ani Ohev Otach",
+    "titleEn": "How Much I Love You",
+    "artist": "גיא מזיג",
+    "artistEn": "Guy Mazig",
+    "year": 2010,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#e84060",
+    "lines": [
+      [
+        {
+          "hebrew": "כמה",
+          "transliteration": "kama",
+          "translation": "how much",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אוהב",
+          "transliteration": "ohev",
+          "translation": "love",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותך",
+          "transliteration": "otach",
+          "translation": "you",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אין",
+          "transliteration": "ein",
+          "translation": "there are no",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מילים",
+          "transliteration": "milim",
+          "translation": "words",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לתאר",
+          "transliteration": "leta'er",
+          "translation": "to describe",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כמה",
+          "transliteration": "kama",
+          "translation": "how much",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "את",
+          "transliteration": "at",
+          "translation": "you (f)",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חשובה",
+          "transliteration": "chshova",
+          "translation": "important",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לי",
+          "transliteration": "li",
+          "translation": "to me",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כמה",
+          "transliteration": "kama",
+          "translation": "how much",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אני",
+          "transliteration": "ani",
+          "translation": "I",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אוהב",
+          "transliteration": "ohev",
+          "translation": "love",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אותך",
+          "transliteration": "otach",
+          "translation": "you",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "יותר",
+          "transliteration": "yoter",
+          "translation": "more",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מכל",
+          "transliteration": "mikol",
+          "translation": "than anything",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "דבר",
+          "transliteration": "davar",
+          "translation": "thing",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "בעולם",
+          "transliteration": "ba'olam",
+          "translation": "in the world",
+          "lineBreak": true
+        }
+      ]
+    ]
+  },
+  {
+    "id": "anachnu",
+    "title": "אנחנו",
+    "titleTranslit": "Anachnu",
+    "titleEn": "We",
+    "artist": "גיא מזיג",
+    "artistEn": "Guy Mazig",
+    "year": 2012,
+    "genre": "פופ",
+    "genreEn": "Pop",
+    "spotifyId": null,
+    "coverColor": "#40a0e8",
+    "lines": [
+      [
+        {
+          "hebrew": "אנחנו",
+          "transliteration": "anachnu",
+          "translation": "we",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יחד",
+          "transliteration": "yachad",
+          "translation": "together",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תמיד",
+          "transliteration": "tamid",
+          "translation": "always",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "משנה",
+          "transliteration": "meshane",
+          "translation": "matters",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "מה",
+          "transliteration": "ma",
+          "translation": "what",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יהיה",
+          "transliteration": "yihye",
+          "translation": "will be",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אנחנו",
+          "transliteration": "anachnu",
+          "translation": "we",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "חזקים",
+          "transliteration": "chazakim",
+          "translation": "strong",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "ביחד",
+          "transliteration": "beyachad",
+          "translation": "together",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אנחנו",
+          "transliteration": "anachnu",
+          "translation": "we",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אחד",
+          "transliteration": "echad",
+          "translation": "one",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "כי",
+          "transliteration": "ki",
+          "translation": "because",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "אנחנו",
+          "transliteration": "anachnu",
+          "translation": "we",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "לא",
+          "transliteration": "lo",
+          "translation": "not",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "נפרדים",
+          "transliteration": "nifradim",
+          "translation": "separate",
+          "lineBreak": true
+        }
+      ],
+      [
+        {
+          "hebrew": "אנחנו",
+          "transliteration": "anachnu",
+          "translation": "we",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "תמיד",
+          "transliteration": "tamid",
+          "translation": "always",
+          "lineBreak": false
+        },
+        {
+          "hebrew": "יחד",
+          "transliteration": "yachad",
+          "translation": "together",
+          "lineBreak": true
+        }
+      ]
+    ]
+  }
+];
+
+// State
+let currentSong = null;
+let showTranslit = true;
+let showTrans = true;
+let largeFont = false;
+let activeGenre = 'All';
+let searchQuery = '';
+let learnedWords = new Set(JSON.parse(localStorage.getItem('lishon_words') || '[]'));
+let highlighted = new Set();
+
+const GENRES = ['All', 'Rock', 'Pop', 'Folk', 'Indie'];
+const MILESTONES = [10, 25, 50, 100];
+
+// Init
+updateWordsBadge();
+renderGenres();
+renderSongs();
+
+function updateWordsBadge() {
+  const el = document.getElementById('words-badge');
+  el.textContent = `✨ ${learnedWords.size} words`;
+}
+
+function saveWords() {
+  localStorage.setItem('lishon_words', JSON.stringify([...learnedWords]));
+}
+
+function renderGenres() {
+  const el = document.getElementById('genres');
+  el.innerHTML = GENRES.map(g =>
+    `<div class="genre-chip ${g === activeGenre ? 'active' : ''}" onclick="setGenre('${g}')">${g}</div>`
+  ).join('');
+}
+
+function setGenre(g) {
+  activeGenre = g;
+  renderGenres();
+  renderSongs();
+}
+
+document.getElementById('search-input').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderSongs();
+});
+
+function renderSongs() {
+  const q = searchQuery.toLowerCase();
+  const filtered = SONGS.filter(s => {
+    const matchSearch = !q ||
+      s.title.includes(searchQuery) ||
+      s.titleTranslit.toLowerCase().includes(q) ||
+      s.artistEn.toLowerCase().includes(q) ||
+      s.artist.includes(searchQuery);
+    const matchGenre = activeGenre === 'All' ||
+      s.genreEn.toLowerCase().includes(activeGenre.toLowerCase());
+    return matchSearch && matchGenre;
+  });
+
+  const el = document.getElementById('song-list');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-emoji">🎵</div><div>לא נמצאו שירים</div></div>';
+    return;
+  }
+  const wordCount = s => s.lines.reduce((a, l) => a + l.length, 0);
+  el.innerHTML = filtered.map((s, i) => `
+    <div class="song-card" onclick="openSong('${s.id}')">
+      <div class="cover-swatch" style="background:${s.coverColor}">
+        <span class="cover-letter">${s.title[0]}</span>
+      </div>
+      <div class="song-info">
+        <div class="song-title-he">${s.title}</div>
+        <div class="song-title-tr">${s.titleTranslit}</div>
+        <div class="song-artist">${s.artist}</div>
+        <div class="song-meta">
+          <span class="genre-tag">${s.genreEn}</span>
+          <span class="meta-dot">·</span>
+          <span class="genre-tag">${s.year}</span>
+          <span class="meta-dot">·</span>
+          <span class="genre-tag">${wordCount(s)} מילים</span>
+        </div>
+      </div>
+      <div class="chevron">›</div>
+    </div>
+  `).join('');
+}
+
+function openSong(id) {
+  currentSong = SONGS.find(s => s.id === id);
+  highlighted = new Set();
+  showTranslit = true;
+  showTrans = true;
+  largeFont = false;
+
+  document.getElementById('dot-translit').className = 'toggle-dot on';
+  document.getElementById('dot-trans').className = 'toggle-dot on';
+  document.getElementById('toggle-translit').className = 'toggle-btn active';
+  document.getElementById('toggle-trans').className = 'toggle-btn active';
+  document.getElementById('size-btn').className = 'size-btn';
+
+  document.getElementById('lyrics-header-title').textContent = currentSong.title;
+  document.getElementById('lyrics-header-artist').textContent = currentSong.artistEn + ' · ' + currentSong.year;
+
+  document.getElementById('hero').style.background = currentSong.coverColor;
+  document.getElementById('hero').innerHTML = `
+    <div class="hero-title">${currentSong.title}</div>
+    <div class="hero-translit" dir="ltr">${currentSong.titleTranslit}</div>
+    <div class="hero-en" dir="ltr">${currentSong.titleEn}</div>
+    <div class="hero-meta">
+      <span class="hero-pill">${currentSong.artistEn}</span>
+      <span class="hero-pill">${currentSong.year}</span>
+      <span class="hero-pill">${currentSong.genreEn}</span>
+    </div>
+  `;
+
+  renderLyrics();
+
+  document.getElementById('home').classList.remove('slide-up');
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('lyrics').classList.remove('hidden');
+  document.getElementById('lyrics').classList.add('slide-up');
+  document.getElementById('lyrics').scrollTop = 0;
+
+  localStorage.setItem('lishon_last', id);
+}
+
+function goHome() {
+  document.getElementById('lyrics').classList.remove('slide-up');
+  document.getElementById('lyrics').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+  document.getElementById('home').classList.add('slide-up');
+}
+
+document.getElementById('back-btn').onclick = goHome;
+
+function renderLyrics() {
+  if (!currentSong) return;
+  const el = document.getElementById('lyrics-content');
+  const sizeCls = largeFont ? ' large' : '';
+
+  const linesHtml = currentSong.lines.map((line, li) => {
+    const wordsHtml = line.map((w, wi) => {
+      const hlit = highlighted.has(li + '_' + wi) ? ' highlighted' : '';
+      const tHide = showTranslit ? '' : ' hidden';
+      const trHide = showTrans ? '' : ' hidden';
+      return `<div class="word-card${hlit}" onclick="tapWord(${li},${wi})">
+        <div class="w-hebrew${sizeCls}">${w.hebrew}</div>
+        <div class="w-translit${sizeCls}${tHide}">${w.transliteration}</div>
+        <div class="w-translation${sizeCls}${trHide}">${w.translation}</div>
+      </div>`;
+    }).join('');
+    return `<div class="lyric-line">${wordsHtml}</div>`;
+  }).join('');
+
+  const totalSongs = SONGS.length;
+  const songIdx = SONGS.findIndex(s => s.id === currentSong.id);
+  const dotsHtml = Array.from({length: Math.min(totalSongs, 15)}, (_, i) =>
+    `<div class="progress-dot${i === songIdx ? ' active' : ''}"></div>`
+  ).join('');
+
+  el.innerHTML = linesHtml +
+    `<div class="lyrics-footer">🎵 ${currentSong.artist} — ${currentSong.titleEn}</div>
+     <div class="progress-bar">${dotsHtml}</div>`;
+}
+
+function tapWord(li, wi) {
+  const word = currentSong.lines[li][wi];
+  const key = li + '_' + wi;
+  const card = document.querySelectorAll('.lyric-line')[li]
+    ?.querySelectorAll('.word-card')[wi];
+
+  if (highlighted.has(key)) {
+    highlighted.delete(key);
+    card?.classList.remove('highlighted');
+  } else {
+    highlighted.add(key);
+    card?.classList.add('highlighted');
+    // Learn word
+    const wasNew = !learnedWords.has(word.hebrew);
+    learnedWords.add(word.hebrew);
+    saveWords();
+    updateWordsBadge();
+    if (wasNew) checkMilestone();
+  }
+}
+
+function checkMilestone() {
+  const count = learnedWords.size;
+  if (MILESTONES.includes(count)) {
+    const msgs = {10:'🎉 10 מילים!', 25:'⭐ 25 מילים!', 50:'🔥 50 מילים!', 100:'🏆 100 מילים!'};
+    showToast(msgs[count] || `✨ ${count}!`);
+    const badge = document.getElementById('words-badge');
+    badge.classList.add('pop');
+    setTimeout(() => badge.classList.remove('pop'), 400);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function toggleTranslit() {
+  showTranslit = !showTranslit;
+  document.getElementById('dot-translit').className = 'toggle-dot' + (showTranslit ? ' on' : '');
+  document.getElementById('toggle-translit').className = 'toggle-btn' + (showTranslit ? ' active' : '');
+  document.querySelectorAll('.w-translit').forEach(el => {
+    el.classList.toggle('hidden', !showTranslit);
+  });
+}
+
+function toggleTrans() {
+  showTrans = !showTrans;
+  document.getElementById('dot-trans').className = 'toggle-dot' + (showTrans ? ' on' : '');
+  document.getElementById('toggle-trans').className = 'toggle-btn' + (showTrans ? ' active' : '');
+  document.querySelectorAll('.w-translation').forEach(el => {
+    el.classList.toggle('hidden', !showTrans);
+  });
+}
+
+function toggleSize() {
+  largeFont = !largeFont;
+  document.getElementById('size-btn').className = 'size-btn' + (largeFont ? ' active' : '');
+  renderLyrics();
+}
+
+// Restore last song
+const lastId = localStorage.getItem('lishon_last');
+</script>
+</body>
+</html>
