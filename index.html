@@ -551,7 +551,12 @@ function buildQuiz(){
     const k=`${s.id}:${li}:${wi}`;
     if(!map[k])map[k]={k,hebrew:wo.hebrew,transliteration:wo.transliteration,translation:wo.translation,song:s.titleTranslit,srs:srs[k]||{lvl:0,next:0,t:0,n:0},isDue:(srs[k]?.next||0)<=now};
   })));
-  qWords=Object.values(map).sort((a,b)=>a.isDue!==b.isDue?b.isDue-a.isDue:a.srs.lvl-b.srs.lvl).slice(0,50);
+  const sorted=Object.values(map).sort((a,b)=>a.isDue!==b.isDue?b.isDue-a.isDue:a.srs.lvl-b.srs.lvl);
+  // Shuffle within due/not-due groups for variety
+  const due=sorted.filter(w=>w.isDue);
+  const notDue=sorted.filter(w=>!w.isDue);
+  [due,notDue].forEach(arr=>{for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}});
+  qWords=[...due,...notDue].slice(0,50);
   qIdx=0;qRev=false;
   renderQuizMenu();
 }
