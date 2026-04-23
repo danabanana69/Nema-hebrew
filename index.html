@@ -133,6 +133,32 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--wht);font
 @keyframes popIn { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
 .wcard.hl { animation: popIn .2s ease; }
 
+
+/* Badges */
+.badges-modal { position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center;padding:20px; }
+.badges-modal.open { display:flex; }
+.badges-box { background:var(--surf);border:1px solid var(--bdr);border-radius:20px;padding:24px;width:100%;max-width:380px;max-height:80vh;overflow-y:auto; }
+.badge-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px; }
+.badge-item { background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px 8px;text-align:center;transition:border-color .2s; }
+.badge-item.earned { border-color:var(--gold);background:rgba(240,165,0,.08); }
+.badge-item.locked { opacity:.4; }
+.badge-icon { font-size:28px;margin-bottom:6px; }
+.badge-name { font-size:11px;font-weight:600;color:var(--wht); }
+.badge-desc { font-size:10px;color:var(--muted);margin-top:2px; }
+
+/* Weekly report */
+.weekly-card { background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:16px;width:100%;max-width:340px; }
+.weekly-row { display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr); }
+.weekly-row:last-child { border-bottom:none; }
+
+/* Level up popup */
+.lvlup { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#1a1a2e,#2d1a5e);border:2px solid var(--gold);border-radius:24px;padding:32px 40px;text-align:center;z-index:999;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none; }
+.lvlup.show { transform:translate(-50%,-50%) scale(1);opacity:1; }
+
+/* Streak animation */
+@keyframes streakPop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+.streak-fire.pop { animation:streakPop .3s ease; }
+
 /* quiz */
 .quiz-wrap{padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:100px}
 .qcard{width:100%;max-width:340px;min-height:180px;background:var(--card);border:1.5px solid var(--bdr);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;cursor:pointer;transition:border-color .3s,box-shadow .3s}
@@ -180,7 +206,7 @@ textarea.mi{min-height:140px;resize:vertical;direction:rtl;line-height:1.6}
   <div class="streak-bar" id="streak-bar">
     <span><span class="streak-fire">🔥</span><span class="streak-count" id="streak-num">0</span> day streak</span>
     <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-fill" style="width:0%"></div></div>
-    <span class="level-badge" id="level-badge">Lv.1</span>
+    <span class="level-badge" id="level-badge" onclick="openBadges()" style="cursor:pointer">Lv.1</span>
   </div>
   <div class="tab-bar">
     <button class="tab on" id="tab-songs" onclick="switchTab('songs')">🎵 Songs</button>
@@ -229,6 +255,36 @@ textarea.mi{min-height:140px;resize:vertical;direction:rtl;line-height:1.6}
   <div id="root-content"></div>
 </div>
 <div id="root-bg" style="display:none;position:fixed;inset:0;z-index:99" onclick="closeRoot()"></div>
+
+
+<!-- BADGES MODAL -->
+<div class="badges-modal" id="badges-modal">
+  <div class="badges-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <div style="font-size:17px;font-weight:700;color:var(--gold)">🏅 Badges</div>
+      <button onclick="document.getElementById('badges-modal').classList.remove('open')" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div id="badges-grid" class="badge-grid"></div>
+  </div>
+</div>
+
+<!-- WEEKLY REPORT MODAL -->
+<div class="badges-modal" id="weekly-modal">
+  <div class="badges-box" style="max-width:340px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-size:17px;font-weight:700;color:var(--gold)">📊 Weekly Report</div>
+      <button onclick="document.getElementById('weekly-modal').classList.remove('open')" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div id="weekly-content"></div>
+  </div>
+</div>
+
+<!-- LEVEL UP -->
+<div class="lvlup" id="lvlup">
+  <div style="font-size:48px;margin-bottom:8px">⭐</div>
+  <div style="color:var(--gold);font-size:26px;font-weight:900" id="lvlup-text">Level Up!</div>
+  <div style="color:var(--muted);font-size:14px;margin-top:6px" id="lvlup-sub"></div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -415,8 +471,10 @@ function tapWord(li,wi){
     const h=w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
     const isNew=!learned.has(h);
     learned.add(h);saveW();badge();
-    if(isNew){milestone();addXP(10);checkStreak();}
+    trackWeeklyWord(h);
+    if(isNew){milestone();addXP(10);checkStreak();checkBadges();}
     else addXP(2);
+    checkBadges();
   }
 }
 
@@ -619,15 +677,129 @@ function showQDone(){
       <div class="qstat-row" style="justify-content:center;margin-top:16px">
         <div class="qstat"><div class="qstat-n">${learned.size}</div><div class="qstat-l">total learned</div></div>
       </div>
-      <button onclick="buildQuiz()" style="margin-top:20px;background:rgba(240,165,0,.15);border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">Go again →</button>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onclick="buildQuiz()" style="flex:1;background:rgba(240,165,0,.15);border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer">Go again →</button>
+        <button onclick="openWeeklyReport()" style="flex:1;background:var(--card);border:1px solid var(--bdr);color:var(--muted);border-radius:20px;padding:10px 16px;font-size:14px;cursor:pointer">📊 Report</button>
+      </div>
+      <button onclick="openBadges()" style="width:100%;max-width:280px;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px">🏅 View badges →</button>
     </div>`;
 }
 
+
+
+// ── BADGES ────────────────────────────────────────────────────
+const ALL_BADGES = [
+  {id:'first_word', icon:'🌱', name:'First Word', desc:'Learn your first word', check:()=>learned.size>=1},
+  {id:'ten_words',  icon:'🔟', name:'10 Words',   desc:'Learn 10 words',       check:()=>learned.size>=10},
+  {id:'fifty',      icon:'🌟', name:'50 Words',   desc:'Learn 50 words',       check:()=>learned.size>=50},
+  {id:'hundred',    icon:'💯', name:'100 Words',  desc:'Learn 100 words',      check:()=>learned.size>=100},
+  {id:'streak3',    icon:'🔥', name:'3-Day Fire', desc:'3 day streak',         check:()=>streak>=3},
+  {id:'streak7',    icon:'🌋', name:'Week Streak',desc:'7 day streak',         check:()=>streak>=7},
+  {id:'lv5',        icon:'⭐', name:'Level 5',    desc:'Reach level 5',        check:()=>getLevel()>=5},
+  {id:'lv10',       icon:'🏆', name:'Level 10',  desc:'Reach level 10',       check:()=>getLevel()>=10},
+  {id:'first_song', icon:'🎵', name:'First Song', desc:'Open a song',         check:()=>!!cur},
+  {id:'quizzer',    icon:'🃏', name:'Quizzer',    desc:'Review 20 quiz cards', check:()=>totalReviewed()>=20},
+  {id:'root_fan',   icon:'🌿', name:'Root Fan',   desc:'View 5 roots',         check:()=>rootViews>=5},
+  {id:'editor',     icon:'✏️', name:'Editor',     desc:'Edit a translation',   check:()=>Object.keys(edits).length>=1},
+];
+
+let earnedBadges = new Set(JSON.parse(localStorage.getItem('nema_badges')||'[]'));
+let rootViews = parseInt(localStorage.getItem('nema_rv')||'0');
+let weeklyWords = JSON.parse(localStorage.getItem('nema_ww')||'{}');
+let lastWeek = localStorage.getItem('nema_wstart')||'';
+
+function saveBadges(){localStorage.setItem('nema_badges',JSON.stringify([...earnedBadges]));}
+function incRootViews(){rootViews++;localStorage.setItem('nema_rv',rootViews);}
+
+function totalReviewed(){
+  return Object.values(srs).reduce((s,v)=>s+(v.n||0),0);
+}
+
+function checkBadges(){
+  ALL_BADGES.forEach(b=>{
+    if(!earnedBadges.has(b.id) && b.check()){
+      earnedBadges.add(b.id);
+      saveBadges();
+      showBadgeToast(b);
+    }
+  });
+}
+
+function showBadgeToast(b){
+  const t=document.getElementById('toast');
+  t.innerHTML=`${b.icon} <strong>${b.name}</strong> unlocked!`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function openBadges(){
+  const grid=document.getElementById('badges-grid');
+  grid.innerHTML=ALL_BADGES.map(b=>{
+    const earned=earnedBadges.has(b.id);
+    return `<div class="badge-item ${earned?'earned':'locked'}">
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('badges-modal').classList.add('open');
+}
+
+// ── WEEKLY REPORT ─────────────────────────────────────────────
+function trackWeeklyWord(w){
+  const today=new Date().toDateString();
+  const weekStart=getWeekStart();
+  if(lastWeek!==weekStart){weeklyWords={};lastWeek=weekStart;localStorage.setItem('nema_wstart',weekStart);}
+  weeklyWords[w]=(weeklyWords[w]||0)+1;
+  localStorage.setItem('nema_ww',JSON.stringify(weeklyWords));
+}
+
+function getWeekStart(){
+  const d=new Date();d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-d.getDay());return d.toDateString();
+}
+
+function openWeeklyReport(){
+  const words=Object.keys(weeklyWords).length;
+  const reviews=totalReviewed();
+  const topWords=Object.entries(weeklyWords).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('weekly-content').innerHTML=`
+    <div class="weekly-row"><span>Words this week</span><strong style="color:var(--gold)">${words}</strong></div>
+    <div class="weekly-row"><span>Quiz reviews</span><strong style="color:var(--gold)">${reviews}</strong></div>
+    <div class="weekly-row"><span>Current streak</span><strong style="color:var(--gold)">${streak} 🔥</strong></div>
+    <div class="weekly-row"><span>Total learned</span><strong style="color:var(--gold)">${learned.size}</strong></div>
+    <div class="weekly-row"><span>Level</span><strong style="color:var(--gold)">${getLevel()}</strong></div>
+    ${topWords.length?`<div style="margin-top:12px;font-size:12px;color:var(--muted);font-weight:600">Top words this week:</div>
+    ${topWords.map(([w,n])=>`<div class="weekly-row"><span style="font-family:'Frank Ruhl Libre',serif;font-size:18px;color:var(--gold)">${w}</span><span style="color:var(--muted)">${n}x</span></div>`).join('')}`:''}
+  `;
+  document.getElementById('weekly-modal').classList.add('open');
+}
+
+// ── UPGRADED LEVEL UP ─────────────────────────────────────────
+function showLevelUp(lvl){
+  const el=document.getElementById('lvlup');
+  document.getElementById('lvlup-text').textContent=`Level ${lvl}!`;
+  const perks={5:'You're on fire! 🔥',10:'Master learner! 🧠',15:'Hebrew hero! 🦸',20:'Legend! 🏆'};
+  document.getElementById('lvlup-sub').textContent=perks[lvl]||`Keep going! ${100*lvl} XP total`;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ── STREAK POPUP ──────────────────────────────────────────────
+function showStreakPopup(){
+  const t=document.getElementById('toast');
+  t.innerHTML=`🔥 <strong>${streak} day streak!</strong> Keep it up!`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+  document.querySelector('.streak-fire')?.classList.add('pop');
+  setTimeout(()=>document.querySelector('.streak-fire')?.classList.remove('pop'),400);
+}
 
 // ── ROOTS ────────────────────────────────────────────────────
 const ROOTS_DATA = {"אהבה":["א-ה-ב","ahav",["אוהב (ohev) loves","אהוב (ahuv) beloved","אהבתי (ahavti) I loved"]],"אוהב":["א-ה-ב","ahav",["אהבה (ahava) love","אהוב (ahuv) beloved"]],"אהוב":["א-ה-ב","ahav",["אהבה (ahava) love","אוהב (ohev) loves"]],"הולך":["ה-ל-כ","halach",["הלך (halach) went","ילך (yelech) will go","הליכה (halicha) walking"]],"הלך":["ה-ל-כ","halach",["הולך (holech) going","ילך (yelech) will go"]],"ילך":["ה-ל-כ","halach",["הולך (holech) going","הלך (halach) went"]],"חוזר":["ח-ז-ר","chazar",["חזר (chazar) returned","יחזור (yachzor) will return","חזרה (chazara) return/rehearsal"]],"חזר":["ח-ז-ר","chazar",["חוזר (chozer) returning","חזרה (chazara) return"]],"שומע":["ש-מ-ע","shama",["שמע (shama) heard","ישמע (yishma) will hear","שמיעה (shmia) hearing"]],"שמע":["ש-מ-ע","shama",["שומע (shomea) hearing","ישמע (yishma) will hear"]],"רואה":["ר-א-ה","ra'a",["ראה (ra'a) saw","יראה (yir'e) will see","ראייה (re'iya) vision"]],"ראה":["ר-א-ה","ra'a",["רואה (ro'e) seeing","יראה (yir'e) will see"]],"מדבר":["ד-ב-ר","diber",["דיבר (diber) spoke","ידבר (yedaber) will speak","דיבור (dibur) speech"]],"דיבר":["ד-ב-ר","diber",["מדבר (medaber) speaking","דיבור (dibur) speech"]],"כותב":["כ-ת-ב","katav",["כתב (katav) wrote","כתיבה (ktiva) writing","כתובת (ktovet) address"]],"כתב":["כ-ת-ב","katav",["כותב (kotev) writing","כתיבה (ktiva) writing","כתובת (ktovet) address"]],"חיים":["ח-י-ה","chaya",["חי (chai) alive","חיה (chaya) lived","חיות (chayut) vitality"]],"חי":["ח-י-ה","chaya",["חיים (chaim) life","חיה (chaya) animal/lived"]],"לומד":["ל-מ-ד","lamad",["למד (lamad) learned","ילמד (yilmad) will learn","מלמד (melamad) teacher"]],"למד":["ל-מ-ד","lamad",["לומד (lomed) learning","מלמד (melamad) teacher"]],"שיר":["ש-י-ר","shir",["שר (shar) sang","שירה (shira) singing/poetry","שירים (shirim) songs"]],"שר":["ש-י-ר","shir",["שיר (shir) song","שירה (shira) poetry"]],"יודע":["י-ד-ע","yada",["ידע (yada) knew","ידיעה (yedia) knowledge","ידוע (yadu'a) known"]],"ידע":["י-ד-ע","yada",["יודע (yode'a) knowing","ידוע (yadu'a) known"]],"ידוע":["י-ד-ע","yada",["יודע (yode'a) knows","ידע (yada) knew"]],"מחפש":["ח-פ-ש","chapas",["חיפש (chips) searched","חיפוש (chipus) search"]],"מרגיש":["ר-ג-ש","ragash",["הרגיש (hirgish) felt","רגש (regesh) emotion","רגשות (regashot) emotions"]],"להרגיש":["ר-ג-ש","ragash",["מרגיש (margish) feeling","רגש (regesh) emotion"]],"זכרונות":["ז-כ-ר","zachar",["זכר (zachar) remembered","זיכרון (zikaron) memory","זוכר (zocher) remembering"]],"זוכר":["ז-כ-ר","zachar",["זכרונות (zichronot) memories","זיכרון (zikaron) memory"]],"עוזב":["ע-ז-ב","azav",["עזב (azav) left","עזיבה (aziva) leaving","שעזבנו (she'azavnu) that we left"]],"נוסע":["נ-ס-ע","nasa",["נסע (nasa) traveled","נסיעה (nesia) travel","לנסוע (linso'a) to travel"]],"בוכה":["ב-כ-ה","bacha",["בכה (bacha) cried","בכי (bchi) crying","בכייה (bchiya) weeping"]],"לשכוח":["ש-כ-ח","shachach",["שכח (shachach) forgot","שוכח (shochach) forgetting","נשכח (nishkach) forgotten"]],"שכחנו":["ש-כ-ח","shachach",["לשכוח (lishkoach) to forget","שכח (shachach) forgot"]],"קרוב":["ק-ר-ב","karav",["קרב (karav) approached","להתקרב (lehitkarev) to get closer","קרבה (kirva) closeness"]],"רחוק":["ר-ח-ק","rachak",["רחק (rachak) distanced","ריחוק (richuk) distance","להתרחק (lehitrachek) to distance"]]};
 
 function showRoot(hebrew) {
+  incRootViews(); checkBadges();
   const clean = hebrew.replace(/[^\u05d0-\u05ea]/g, '');
   const root = ROOTS_DATA[clean];
   const el = document.getElementById('root-content');
@@ -682,14 +854,15 @@ function addXP(amount) {
 function checkStreak() {
   const today = new Date().toDateString();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
-  if (lastActive === today) return; // already active today
-  if (lastActive === yesterday) streak++;
+  if (lastActive === today) return;
+  if (lastActive === yesterday) { streak++; setTimeout(showStreakPopup, 500); }
   else if (lastActive !== '') streak = 1;
   else streak = 1;
   lastActive = today;
   localStorage.setItem('nema_last', today);
   saveStreak();
   updateStreakBar();
+  checkBadges();
 }
 
 function updateStreakBar() {
@@ -711,6 +884,7 @@ function showLevelUp(lvl) {
 badge();
 updateStreakBar();
 checkStreak();
+checkBadges();
 renderGenres();
 renderSongs();
 </script>
