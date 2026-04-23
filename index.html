@@ -713,11 +713,10 @@ function nextQuiz() { if (quizIdx < quizWords.length-1) { quizIdx++; quizReveale
 function prevQuiz() { if (quizIdx > 0) { quizIdx--; quizRevealed=false; renderCard(); } }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  updateBadge();
-  renderGenres();
-  renderSongs();
-});
+// Scripts are at bottom of body, DOM is ready
+updateBadge();
+renderGenres();
+renderSongs();
 </script>
 
 <!-- Edit Popup -->
@@ -1231,11 +1230,10 @@ function nextQuiz() { if (quizIdx < quizWords.length-1) { quizIdx++; quizReveale
 function prevQuiz() { if (quizIdx > 0) { quizIdx--; quizRevealed=false; renderCard(); } }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  updateBadge();
-  renderGenres();
-  renderSongs();
-});
+// Scripts are at bottom of body, DOM is ready
+updateBadge();
+renderGenres();
+renderSongs();
 
 </script>
 </body>
