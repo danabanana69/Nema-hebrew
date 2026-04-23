@@ -2,1239 +2,571 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Nema">
 <meta name="theme-color" content="#0d0d1a">
 <title>Nema — Learning Hebrew</title>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0d0d1a; --surface: #1a1a2e; --card: #1e2540;
-  --border: rgba(255,255,255,0.08); --gold: #f0a500;
-  --gold-glow: rgba(240,165,0,0.25); --white: #f0f0f0;
-  --muted: #6b7a99; --trans: #8892a4;
-}
-*{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-html,body{ height:100%; overflow:hidden; background:var(--bg); color:var(--white); font-family:'Inter',sans-serif; }
-
-/* SCREENS */
-.screen{ position:fixed; inset:0; overflow-y:auto; background:var(--bg); transition:transform .4s cubic-bezier(.4,0,.2,1), opacity .4s; will-change:transform; }
-.screen.hidden{ transform:translateY(100%); opacity:0; pointer-events:none; }
-
-/* TAB BAR */
-.tab-bar{ display:flex; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:20; }
-.tab-btn{ flex:1; padding:12px 8px; font-size:14px; font-weight:600; color:var(--muted); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; }
-.tab-btn.active{ color:var(--gold); border-bottom-color:var(--gold); }
-
-/* HOME HEADER */
-.home-header{ padding:20px 20px 12px; display:flex; justify-content:space-between; align-items:flex-end; }
-.app-name{ font-family:'Frank Ruhl Libre',serif; font-size:42px; font-weight:900; color:var(--gold); letter-spacing:2px; }
-.app-sub{ font-size:13px; color:var(--muted); margin-top:4px; }
-.words-badge{ background:var(--card); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:13px; color:var(--gold); font-weight:600; white-space:nowrap; }
-
-/* SONGS TAB */
-.search-wrap{ padding:0 20px 12px; }
-.search-box{ width:100%; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px 16px; color:var(--white); font-size:15px; outline:none; }
-.search-box::placeholder{ color:var(--muted); }
-.genres{ display:flex; gap:8px; padding:0 20px 16px; overflow-x:auto; scrollbar-width:none; }
-.genres::-webkit-scrollbar{ display:none; }
-.genre-chip{ background:var(--card); border:1px solid var(--border); border-radius:999px; padding:7px 16px; font-size:13px; color:var(--muted); cursor:pointer; white-space:nowrap; }
-.genre-chip.active{ background:rgba(240,165,0,.15); border-color:var(--gold); color:var(--gold); }
-.song-list{ padding:0 20px 100px; display:flex; flex-direction:column; gap:10px; }
-.song-card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; display:flex; align-items:center; gap:14px; cursor:pointer; direction:rtl; transition:transform .15s; }
-.song-card:active{ transform:scale(.97); }
-.cover{ width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.cover-letter{ font-family:'Frank Ruhl Libre',serif; font-size:30px; font-weight:900; color:rgba(255,255,255,.85); }
-.song-info{ flex:1; min-width:0; }
-.song-title-he{ font-family:'Frank Ruhl Libre',serif; font-size:18px; font-weight:700; color:var(--white); }
-.song-title-tr{ font-size:13px; color:var(--muted); margin-top:2px; direction:ltr; text-align:right; }
-.song-artist{ font-size:12px; color:var(--muted); margin-top:4px; }
-.song-meta{ display:flex; gap:6px; align-items:center; margin-top:6px; direction:ltr; justify-content:flex-end; flex-wrap:wrap; }
-.tag{ background:rgba(255,255,255,.06); border-radius:999px; padding:2px 10px; font-size:11px; color:var(--muted); }
-.fav-btn{ background:none; border:none; font-size:22px; cursor:pointer; padding:4px; flex-shrink:0; }
-.chevron{ color:var(--muted); font-size:22px; flex-shrink:0; }
-.empty-state{ text-align:center; padding:60px 20px; color:var(--muted); }
-
-/* QUIZ TAB */
-.quiz-wrap{ padding:20px; display:flex; flex-direction:column; align-items:center; gap:20px; padding-bottom:100px; }
-.quiz-card{ width:100%; max-width:340px; min-height:200px; background:var(--card); border:1.5px solid var(--border); border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; cursor:pointer; transition:border-color .3s, box-shadow .3s; }
-.quiz-card:active{ transform:scale(.97); }
-.quiz-card.revealed{ border-color:var(--gold); box-shadow:0 0 20px var(--gold-glow); }
-.quiz-heb{ font-family:'Frank Ruhl Libre',serif; font-size:40px; font-weight:900; color:var(--gold); text-align:center; margin-bottom:8px; }
-.quiz-heb.sm{ font-size:22px; line-height:1.5; }
-.quiz-tr{ font-size:17px; color:var(--white); text-align:center; opacity:.85; }
-.quiz-trans{ font-size:18px; font-weight:700; color:var(--gold); text-align:center; opacity:0; transition:opacity .3s; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); width:100%; }
-.quiz-card.revealed .quiz-trans{ opacity:1; }
-.quiz-hint{ font-size:12px; color:var(--muted); font-style:italic; margin-top:12px; }
-.quiz-card.revealed .quiz-hint{ display:none; }
-.quiz-nav{ display:flex; gap:12px; width:100%; max-width:340px; }
-.q-btn{ flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--white); font-size:14px; font-weight:600; cursor:pointer; }
-.q-btn.next{ background:rgba(240,165,0,.15); border-color:var(--gold); color:var(--gold); }
-.quiz-stat-row{ display:flex; gap:12px; }
-.quiz-stat{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px 20px; text-align:center; }
-.quiz-stat-n{ font-size:22px; font-weight:700; color:var(--gold); }
-.quiz-stat-l{ font-size:11px; color:var(--muted); }
-
-
-.edit-popup {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 999; padding: 20px;
-}
-.edit-box {
-  background: var(--surface); border: 1px solid var(--gold);
-  border-radius: 20px; padding: 24px; width: 100%; max-width: 340px;
-  display: flex; flex-direction: column; gap: 14px;
-}
-.edit-title { color: var(--gold); font-size: 16px; font-weight: 700; text-align: center; }
-.edit-hebrew { font-family: 'Frank Ruhl Libre', serif; font-size: 32px; color: var(--gold); text-align: center; }
-.edit-field { display: flex; flex-direction: column; gap: 4px; }
-.edit-label { font-size: 12px; color: var(--muted); }
-.edit-input {
-  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-  padding: 10px 14px; color: var(--white); font-size: 15px; outline: none;
-}
-.edit-input:focus { border-color: var(--gold); }
-.edit-actions { display: flex; gap: 10px; margin-top: 4px; }
-.edit-save {
-  flex: 1; background: rgba(240,165,0,0.15); border: 1px solid var(--gold);
-  color: var(--gold); border-radius: 12px; padding: 12px; font-size: 14px;
-  font-weight: 700; cursor: pointer;
-}
-.edit-cancel {
-  flex: 1; background: var(--card); border: 1px solid var(--border);
-  color: var(--muted); border-radius: 12px; padding: 12px; font-size: 14px;
-  font-weight: 600; cursor: pointer;
-}
-.word-card { position: relative; }
-.edit-btn {
-  position: absolute; top: -6px; right: -6px; width: 18px; height: 18px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 50%;
-  font-size: 9px; cursor: pointer; display: none; align-items: center;
-  justify-content: center; color: var(--muted); z-index: 5;
-}
-.word-card:hover .edit-btn { display: flex; }
-
-
-.add-btn-float {
-  position: fixed; bottom: 24px; right: 20px;
-  width: 52px; height: 52px; border-radius: 50%;
-  background: var(--gold); color: #000; border: none;
-  font-size: 26px; cursor: pointer; z-index: 50;
-  box-shadow: 0 4px 16px rgba(240,165,0,0.4);
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.15s;
-}
-.add-btn-float:active { transform: scale(0.92); }
-.add-modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-  z-index: 998; overflow-y: auto; padding: 20px;
-  display: none; align-items: flex-start; justify-content: center;
-}
-.add-modal.open { display: flex; }
-.add-box {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; padding: 24px; width: 100%; max-width: 400px;
-  margin: auto; display: flex; flex-direction: column; gap: 14px;
-}
-.add-title { color: var(--gold); font-size: 18px; font-weight: 700; text-align: center; }
-.add-field { display: flex; flex-direction: column; gap: 4px; }
-.add-label { font-size: 12px; color: var(--muted); font-weight: 600; }
-.add-input, .add-textarea {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 14px; color: var(--white);
-  font-size: 14px; outline: none; font-family: inherit;
-}
-.add-input:focus, .add-textarea:focus { border-color: var(--gold); }
-.add-textarea { min-height: 150px; resize: vertical; direction: rtl; line-height: 1.6; }
-.add-hint { font-size: 11px; color: var(--muted); }
-.add-actions { display: flex; gap: 10px; }
-.add-save {
-  flex: 2; background: rgba(240,165,0,0.15); border: 1px solid var(--gold);
-  color: var(--gold); border-radius: 12px; padding: 12px; font-size: 14px;
-  font-weight: 700; cursor: pointer;
-}
-.add-cancel {
-  flex: 1; background: var(--card); border: 1px solid var(--border);
-  color: var(--muted); border-radius: 12px; padding: 12px; font-size: 14px;
-  cursor: pointer;
-}
-.add-status { font-size: 13px; text-align: center; color: var(--gold); min-height: 20px; }
-
-/* LYRICS SCREEN */
-#lyrics{ display:flex; flex-direction:column; }
-.lyr-header{ display:flex; align-items:center; padding:12px 16px; gap:12px; border-bottom:1px solid var(--border); direction:ltr; background:var(--bg); position:sticky; top:0; z-index:10; }
-.back-btn{ width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:999px; background:var(--card); border:1px solid var(--border); cursor:pointer; font-size:24px; color:var(--gold); flex-shrink:0; }
-.lyr-header-info{ flex:1; overflow:hidden; }
-.lyr-header-title{ font-size:15px; font-weight:700; color:var(--white); direction:rtl; }
-.lyr-header-artist{ font-size:12px; color:var(--muted); direction:ltr; }
-.lyr-header-actions{ display:flex; gap:8px; align-items:center; }
-.hero{ padding:20px; flex-shrink:0; }
-.hero-title{ font-family:'Frank Ruhl Libre',serif; font-size:34px; font-weight:900; color:rgba(255,255,255,.95); direction:rtl; }
-.hero-tr{ font-size:16px; color:rgba(255,255,255,.75); margin-top:2px; }
-.hero-en{ font-size:13px; color:rgba(255,255,255,.5); margin-top:2px; font-style:italic; }
-.hero-meta{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
-.hero-pill{ background:rgba(0,0,0,.3); border-radius:999px; padding:4px 12px; font-size:12px; color:rgba(255,255,255,.7); }
-.toolbar{ display:flex; align-items:center; padding:0 16px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; direction:ltr; gap:0; }
-.t-item{ flex:1; padding:12px 8px; display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--muted); cursor:pointer; }
-.t-item.on{ color:var(--gold); }
-.toggle{ width:28px; height:16px; border-radius:999px; background:var(--card); border:1px solid var(--border); position:relative; transition:background .2s; }
-.toggle.on{ background:rgba(240,165,0,.3); border-color:var(--gold); }
-.toggle::after{ content:''; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:var(--muted); transition:transform .2s, background .2s; }
-.toggle.on::after{ transform:translateX(12px); background:var(--gold); }
-.t-div{ width:1px; height:24px; background:var(--border); }
-.size-btn{ padding:8px 12px; font-size:13px; font-weight:700; color:var(--muted); cursor:pointer; border:1px solid var(--border); border-radius:8px; background:var(--card); margin:6px; }
-.size-btn.on{ color:var(--gold); border-color:var(--gold); background:rgba(240,165,0,.1); }
-.yt-btn{ background:#FF0000; color:#fff; border:none; border-radius:20px; padding:7px 14px; font-size:12px; font-weight:700; cursor:pointer; margin:6px; }
-.yt-btn.off{ background:var(--card); color:var(--muted); border:1px solid var(--border); }
-.yt-wrap{ width:100%; background:#000; border-bottom:1px solid var(--border); }
-.yt-wrap iframe{ width:100%; height:120px; border:none; display:block; }
-.lyrics-scroll{ flex:1; overflow-y:auto; padding:16px 12px 80px; }
-.lyric-line{ display:flex; flex-direction:row; flex-wrap:wrap; justify-content:flex-end; align-items:flex-start; margin-bottom:8px; gap:4px; direction:rtl; }
-.word-card{ display:flex; flex-direction:column; align-items:center; padding:8px 10px; border-radius:10px; border:1.5px solid transparent; cursor:pointer; min-width:44px; }
-.word-card:active{ transform:scale(.95); }
-.word-card.hl{ border-color:var(--gold); background:rgba(240,165,0,.1); box-shadow:0 0 12px var(--gold-glow); }
-.w-heb{ font-family:'Frank Ruhl Libre',serif; font-size:28px; font-weight:700; color:var(--gold); text-align:center; line-height:1.2; }
-.w-tr{ font-size:13px; color:var(--white); text-align:center; margin-top:3px; opacity:.85; transition:all .2s; overflow:hidden; max-height:30px; }
-.w-tr.hide{ max-height:0; opacity:0; margin-top:0; }
-.w-trans{ font-size:11px; color:var(--trans); text-align:center; margin-top:2px; font-style:italic; transition:all .2s; overflow:hidden; max-height:30px; }
-.w-trans.hide{ max-height:0; opacity:0; margin-top:0; }
-.large .w-heb{ font-size:36px; }
-.large .w-tr{ font-size:15px; }
-.large .w-trans{ font-size:13px; }
-.toast{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); background:var(--surface); border:1px solid var(--gold); border-radius:20px; padding:16px 28px; font-size:20px; text-align:center; z-index:999; transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s; opacity:0; pointer-events:none; }
-.toast.show{ transform:translate(-50%,-50%) scale(1); opacity:1; }
+:root{--bg:#0d0d1a;--surf:#1a1a2e;--card:#1e2540;--bdr:rgba(255,255,255,.08);--gold:#f0a500;--glow:rgba(240,165,0,.25);--wht:#f0f0f0;--muted:#6b7a99;--tr:#8892a4}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--wht);font-family:'Inter',sans-serif}
+.screen{position:fixed;inset:0;overflow-y:auto;background:var(--bg);transition:transform .35s,opacity .35s}
+.screen.hidden{transform:translateY(100%);opacity:0;pointer-events:none}
+/* tabs */
+.tab-bar{display:flex;background:var(--surf);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:20}
+.tab{flex:1;padding:12px 8px;font-size:14px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+/* header */
+.hdr{padding:20px 20px 12px;display:flex;justify-content:space-between;align-items:flex-end}
+.app-name{font-family:'Frank Ruhl Libre',serif;font-size:42px;font-weight:900;color:var(--gold);letter-spacing:2px}
+.app-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.badge{background:var(--card);border:1px solid var(--bdr);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--gold);font-weight:600}
+/* search */
+.search-wrap{padding:0 20px 12px}
+.search-box{width:100%;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:12px 16px;color:var(--wht);font-size:15px;outline:none}
+.search-box::placeholder{color:var(--muted)}
+/* genres */
+.genres{display:flex;gap:8px;padding:0 20px 16px;overflow-x:auto;scrollbar-width:none}
+.genres::-webkit-scrollbar{display:none}
+.chip{background:var(--card);border:1px solid var(--bdr);border-radius:999px;padding:7px 16px;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.chip.on{background:rgba(240,165,0,.15);border-color:var(--gold);color:var(--gold)}
+/* song list */
+.song-list{padding:0 20px 100px;display:flex;flex-direction:column;gap:10px}
+.scard{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:14px;display:flex;align-items:center;gap:14px;cursor:pointer;direction:rtl;transition:transform .15s}
+.scard:active{transform:scale(.97)}
+.cover{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cover-letter{font-family:'Frank Ruhl Libre',serif;font-size:30px;font-weight:900;color:rgba(255,255,255,.85)}
+.sinfo{flex:1;min-width:0}
+.s-he{font-family:'Frank Ruhl Libre',serif;font-size:18px;font-weight:700}
+.s-tr{font-size:13px;color:var(--muted);margin-top:2px;direction:ltr;text-align:right}
+.s-art{font-size:12px;color:var(--muted);margin-top:4px}
+.s-meta{display:flex;gap:6px;align-items:center;margin-top:6px;direction:ltr;justify-content:flex-end;flex-wrap:wrap}
+.tag{background:rgba(255,255,255,.06);border-radius:999px;padding:2px 10px;font-size:11px;color:var(--muted)}
+.fav-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:4px;flex-shrink:0}
+.chevron{color:var(--muted);font-size:22px;flex-shrink:0}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+/* lyrics */
+#lyrics{display:flex;flex-direction:column}
+.lhdr{display:flex;align-items:center;padding:12px 16px;gap:12px;border-bottom:1px solid var(--bdr);background:var(--bg);position:sticky;top:0;z-index:10;direction:ltr}
+.back{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:var(--card);border:1px solid var(--bdr);cursor:pointer;font-size:24px;color:var(--gold);flex-shrink:0}
+.lhdr-info{flex:1;overflow:hidden}
+.lhdr-title{font-size:15px;font-weight:700;direction:rtl}
+.lhdr-artist{font-size:12px;color:var(--muted)}
+.hero{padding:20px;flex-shrink:0}
+.hero-title{font-family:'Frank Ruhl Libre',serif;font-size:34px;font-weight:900;color:rgba(255,255,255,.95);direction:rtl}
+.hero-tr{font-size:16px;color:rgba(255,255,255,.75);margin-top:2px}
+.hero-en{font-size:13px;color:rgba(255,255,255,.5);margin-top:2px;font-style:italic}
+.hero-meta{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.pill{background:rgba(0,0,0,.3);border-radius:999px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,.7)}
+.toolbar{display:flex;align-items:center;padding:0 16px;background:var(--surf);border-bottom:1px solid var(--bdr);sticky;top:0;z-index:10;direction:ltr}
+.ti{flex:1;padding:12px 8px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);cursor:pointer}
+.ti.on{color:var(--gold)}
+.tog{width:28px;height:16px;border-radius:999px;background:var(--card);border:1px solid var(--bdr);position:relative;transition:background .2s}
+.tog.on{background:rgba(240,165,0,.3);border-color:var(--gold)}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.tog.on::after{transform:translateX(12px);background:var(--gold)}
+.tdiv{width:1px;height:24px;background:var(--bdr)}
+.sz-btn{padding:8px 12px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border:1px solid var(--bdr);border-radius:8px;background:var(--card);margin:6px}
+.sz-btn.on{color:var(--gold);border-color:var(--gold);background:rgba(240,165,0,.1)}
+.yt-btn{background:#FF0000;color:#fff;border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;margin:6px}
+.yt-btn.off{background:var(--card);color:var(--muted);border:1px solid var(--bdr)}
+.yt-wrap{width:100%;background:#000;border-bottom:1px solid var(--bdr)}
+.yt-wrap iframe{width:100%;height:120px;border:none;display:block}
+.lscroll{flex:1;overflow-y:auto;padding:16px 12px 80px}
+.lyric-line{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start;margin-bottom:8px;gap:4px;direction:rtl}
+.wcard{display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:10px;border:1.5px solid transparent;cursor:pointer;min-width:44px;position:relative}
+.wcard:active{transform:scale(.95)}
+.wcard.hl{border-color:var(--gold);background:rgba(240,165,0,.1);box-shadow:0 0 12px var(--glow)}
+.w-he{font-family:'Frank Ruhl Libre',serif;font-size:28px;font-weight:700;color:var(--gold);text-align:center;line-height:1.2}
+.w-tr{font-size:13px;color:var(--wht);text-align:center;margin-top:3px;opacity:.85;overflow:hidden;max-height:30px;transition:all .2s}
+.w-tr.hide{max-height:0;opacity:0;margin-top:0}
+.w-en{font-size:11px;color:var(--tr);text-align:center;margin-top:2px;font-style:italic;overflow:hidden;max-height:30px;transition:all .2s}
+.w-en.hide{max-height:0;opacity:0;margin-top:0}
+.large .w-he{font-size:36px}
+.large .w-tr{font-size:15px}
+.large .w-en{font-size:13px}
+.edit-icon{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:var(--surf);border:1px solid var(--bdr);border-radius:50%;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;color:var(--muted);z-index:5}
+.wcard:hover .edit-icon{display:flex}
+/* quiz */
+.quiz-wrap{padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:100px}
+.qcard{width:100%;max-width:340px;min-height:180px;background:var(--card);border:1.5px solid var(--bdr);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;cursor:pointer;transition:border-color .3s,box-shadow .3s}
+.qcard.rev{border-color:var(--gold);box-shadow:0 0 20px var(--glow)}
+.q-he{font-family:'Frank Ruhl Libre',serif;font-size:40px;font-weight:900;color:var(--gold);text-align:center;margin-bottom:8px}
+.q-he.sm{font-size:22px;line-height:1.5}
+.q-tr{font-size:17px;color:var(--wht);text-align:center;opacity:.85}
+.q-en{font-size:18px;font-weight:700;color:var(--gold);text-align:center;opacity:0;transition:opacity .3s;margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr);width:100%}
+.qcard.rev .q-en{opacity:1}
+.q-hint{font-size:12px;color:var(--muted);font-style:italic;margin-top:10px}
+.qcard.rev .q-hint{display:none}
+.qnav{display:flex;gap:10px;width:100%;max-width:340px}
+.qbtn{flex:1;padding:11px;border-radius:12px;border:1px solid var(--bdr);background:var(--card);color:var(--wht);font-size:14px;font-weight:600;cursor:pointer}
+.qbtn.next{background:rgba(240,165,0,.15);border-color:var(--gold);color:var(--gold)}
+.qstat-row{display:flex;gap:12px}
+.qstat{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:10px 18px;text-align:center}
+.qstat-n{font-size:22px;font-weight:700;color:var(--gold)}
+.qstat-l{font-size:11px;color:var(--muted)}
+/* add song */
+.add-float{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--gold);color:#000;border:none;font-size:26px;cursor:pointer;z-index:50;box-shadow:0 4px 16px rgba(240,165,0,.4);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.add-float:active{transform:scale(.92)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
+.modal-bg.open{display:flex}
+.modal-box{background:var(--surf);border:1px solid var(--bdr);border-radius:20px;padding:24px;width:100%;max-width:400px;margin:auto;display:flex;flex-direction:column;gap:14px}
+.ml{font-size:12px;color:var(--muted);font-weight:600}
+.mi{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;color:var(--wht);font-size:14px;outline:none;font-family:inherit}
+.mi:focus{border-color:var(--gold)}
+textarea.mi{min-height:140px;resize:vertical;direction:rtl;line-height:1.6}
+/* edit popup */
+.edit-popup{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px}
+.edit-box{background:var(--surf);border:1px solid var(--gold);border-radius:20px;padding:24px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px}
+/* toast */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--surf);border:1px solid var(--gold);border-radius:20px;padding:16px 28px;font-size:20px;text-align:center;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none}
+.toast.show{transform:translate(-50%,-50%) scale(1);opacity:1}
 </style>
 </head>
 <body>
 
 <!-- HOME -->
 <div id="home" class="screen">
-  <div class="home-header">
-    <div>
-      <div class="app-name">Nema</div>
-      <div class="app-sub">Learning Hebrew through song</div>
-    </div>
-    <div class="words-badge" id="words-badge">✨ 0 words</div>
+  <div class="hdr">
+    <div><div class="app-name">Nema</div><div class="app-sub">Learning Hebrew through song</div></div>
+    <div class="badge" id="badge">✨ 0 words</div>
   </div>
   <div class="tab-bar">
-    <button class="tab-btn active" id="tab-songs" onclick="switchTab('songs')">🎵 Songs</button>
-    <button class="tab-btn" id="tab-quiz" onclick="switchTab('quiz')">🃏 Quiz</button>
+    <button class="tab on" id="tab-songs" onclick="switchTab('songs')">🎵 Songs</button>
+    <button class="tab" id="tab-quiz" onclick="switchTab('quiz')">🃏 Quiz</button>
   </div>
-
-  <!-- SONGS TAB -->
   <div id="songs-tab">
-    <div class="search-wrap">
-      <input class="search-box" type="search" placeholder="Search songs or artists..." id="search-input">
-    </div>
+    <div class="search-wrap"><input class="search-box" type="search" placeholder="Search..." id="search-input"></div>
     <div class="genres" id="genres"></div>
     <div class="song-list" id="song-list"></div>
   </div>
-
-  <!-- QUIZ TAB -->
-  <div id="quiz-tab" style="display:none;">
+  <div id="quiz-tab" style="display:none">
     <div class="quiz-wrap" id="quiz-content"></div>
   </div>
 </div>
 
 <!-- LYRICS -->
 <div id="lyrics" class="screen hidden">
-  <div class="lyr-header">
-    <div class="back-btn" id="back-btn">‹</div>
-    <div class="lyr-header-info">
-      <div class="lyr-header-title" id="lyr-title"></div>
-      <div class="lyr-header-artist" id="lyr-artist"></div>
+  <div class="lhdr">
+    <div class="back" id="back-btn">‹</div>
+    <div class="lhdr-info">
+      <div class="lhdr-title" id="lyr-title"></div>
+      <div class="lhdr-artist" id="lyr-artist"></div>
     </div>
-    <div class="lyr-header-actions">
-      <button class="fav-btn" id="lyr-fav-btn" onclick="toggleFavFromLyrics()">☆</button>
-    </div>
+    <button class="fav-btn" id="lyr-fav" onclick="toggleFavLyrics()">☆</button>
   </div>
   <div id="hero"></div>
   <div class="toolbar">
-    <div class="t-item on" id="t-tr" onclick="toggleTranslit()">
-      <span>Translit</span><div class="toggle on" id="dot-tr"></div>
-    </div>
-    <div class="t-div"></div>
-    <div class="t-item on" id="t-en" onclick="toggleTrans()">
-      <span>English</span><div class="toggle on" id="dot-en"></div>
-    </div>
-    <div class="t-div"></div>
-    <div class="size-btn" id="size-btn" onclick="toggleSize()">Aa</div>
+    <div class="ti on" id="ti-tr" onclick="toggleTr()"><span>Translit</span><div class="tog on" id="dot-tr"></div></div>
+    <div class="tdiv"></div>
+    <div class="ti on" id="ti-en" onclick="toggleEn()"><span>English</span><div class="tog on" id="dot-en"></div></div>
+    <div class="tdiv"></div>
+    <div class="sz-btn" id="sz-btn" onclick="toggleSz()">Aa</div>
     <button class="yt-btn" id="yt-btn" onclick="toggleYT()">▶ Play</button>
   </div>
-  <div id="yt-container" style="display:none;"><div class="yt-wrap" id="yt-wrap"></div></div>
-  <div class="lyrics-scroll" id="lyr-content"></div>
+  <div id="yt-container" style="display:none"><div class="yt-wrap" id="yt-wrap"></div></div>
+  <div class="lscroll" id="lyr-content"></div>
 </div>
 
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- scripts at bottom -->
-const GENRES = ['All', '⭐ Fav', 'Rock', 'Pop', 'Folk', 'Indie'];
-const MILESTONES = [10,25,50,100];
-
-let currentSong = null;
-let showTr = true, showEn = true, large = false, ytOn = false;
-let hlSet = new Set();
-let activeGenre = 'All';
-let searchQ = '';
-let learnedWords = new Set(JSON.parse(localStorage.getItem('lishon_words') || '[]'));
-let favorites = new Set(JSON.parse(localStorage.getItem('lishon_favs') || '[]'));
-let currentTab = 'songs';
-let quizWords = [], quizIdx = 0, quizRevealed = false;
-
-function saveWords(){ localStorage.setItem('lishon_words', JSON.stringify([...learnedWords])); }
-function saveFavs(){ localStorage.setItem('lishon_favs', JSON.stringify([...favorites])); }
-
-function updateBadge(){
-  document.getElementById('words-badge').textContent = `✨ ${learnedWords.size} words`;
-}
-
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function switchTab(tab){
-  currentTab = tab;
-  document.getElementById('tab-songs').className = 'tab-btn' + (tab==='songs' ? ' active' : '');
-  document.getElementById('tab-quiz').className = 'tab-btn' + (tab==='quiz' ? ' active' : '');
-  document.getElementById('songs-tab').style.display = tab==='songs' ? 'block' : 'none';
-  document.getElementById('quiz-tab').style.display = tab==='quiz' ? 'block' : 'none';
-  if (tab==='quiz') buildQuiz();
-}
-
-// ── GENRES ────────────────────────────────────────────────────────────────────
-function renderGenres(){
-  document.getElementById('genres').innerHTML = GENRES.map(g =>
-    `<div class="genre-chip ${g===activeGenre?'active':''}" onclick="setGenre('${g}')">${g}</div>`
-  ).join('');
-}
-
-function setGenre(g){ activeGenre=g; renderGenres(); renderSongs(); }
-
-// ── SONGS ─────────────────────────────────────────────────────────────────────
-document.getElementById('search-input').addEventListener('input', e => {
-  searchQ = e.target.value; renderSongs();
-});
-
-function renderSongs(){
-  const q = searchQ.toLowerCase();
-  const filtered = SONGS.filter(s => {
-    const ms = !q || s.title.includes(searchQ) || s.titleTranslit.toLowerCase().includes(q) || s.artistEn.toLowerCase().includes(q);
-    const mg = activeGenre==='All' || (activeGenre==='⭐ Fav' && favorites.has(s.id)) || s.genreEn.toLowerCase().includes(activeGenre.toLowerCase());
-    return ms && mg;
-  });
-  const el = document.getElementById('song-list');
-  if (!filtered.length) { el.innerHTML='<div class="empty-state">🎵 No songs found</div>'; return; }
-  const wc = s => s.lines.reduce((a,l)=>a+l.length,0);
-  el.innerHTML = filtered.map(s => `
-    <div class="song-card" onclick="openSong('${s.id}')">
-      <div class="cover" style="background:${s.coverColor}"><span class="cover-letter">${s.title[0]}</span></div>
-      <div class="song-info">
-        <div class="song-title-he">${s.title}</div>
-        <div class="song-title-tr">${s.titleTranslit}</div>
-        <div class="song-artist">${s.artistEn}</div>
-        <div class="song-meta">
-          <span class="tag">${s.genreEn}</span>
-          <span class="tag">${s.year}</span>
-          <span class="tag">${wc(s)} words</span>
-        </div>
-      </div>
-      <button class="fav-btn" onclick="toggleFav('${s.id}',event)">${favorites.has(s.id)?'⭐':'☆'}</button>
-      <div class="chevron">›</div>
-    </div>`).join('');
-}
-
-function toggleFav(id,e){ e.stopPropagation(); favorites.has(id)?favorites.delete(id):favorites.add(id); saveFavs(); renderSongs(); updateLyrFav(); }
-function toggleFavFromLyrics(){ if(currentSong) toggleFav(currentSong.id, {stopPropagation:()=>{}}); }
-function updateLyrFav(){ const b=document.getElementById('lyr-fav-btn'); if(b&&currentSong) b.textContent=favorites.has(currentSong.id)?'⭐':'☆'; }
-
-// ── OPEN SONG ─────────────────────────────────────────────────────────────────
-function openSong(id){
-  currentSong = SONGS.find(s=>s.id===id);
-  hlSet = new Set(); showTr=true; showEn=true; large=false; ytOn=false;
-  document.getElementById('dot-tr').className='toggle on';
-  document.getElementById('dot-en').className='toggle on';
-  document.getElementById('t-tr').className='t-item on';
-  document.getElementById('t-en').className='t-item on';
-  document.getElementById('size-btn').className='size-btn';
-  document.getElementById('yt-btn').className='yt-btn';
-  document.getElementById('yt-container').style.display='none';
-  document.getElementById('yt-wrap').innerHTML='';
-  document.getElementById('lyr-title').textContent=currentSong.title;
-  document.getElementById('lyr-artist').textContent=currentSong.artistEn+' · '+currentSong.year;
-  document.getElementById('hero').style.background=currentSong.coverColor;
-  document.getElementById('hero').innerHTML=`
-    <div class="hero-title">${currentSong.title}</div>
-    <div class="hero-tr">${currentSong.titleTranslit}</div>
-    <div class="hero-en">${currentSong.titleEn}</div>
-    <div class="hero-meta">
-      <span class="hero-pill">${currentSong.artistEn}</span>
-      <span class="hero-pill">${currentSong.year}</span>
-      <span class="hero-pill">${currentSong.genreEn}</span>
-    </div>`;
-  updateLyrFav();
-  renderLyrics();
-  document.getElementById('home').classList.add('hidden');
-  document.getElementById('add-float-btn').style.display='none';
-  document.getElementById('lyrics').classList.remove('hidden');
-  document.getElementById('lyrics').scrollTop=0;
-  localStorage.setItem('lishon_last', id);
-}
-
-document.getElementById('back-btn').onclick = () => {
-  document.getElementById('lyrics').classList.add('hidden');
-  document.getElementById('home').classList.remove('hidden');
-  document.getElementById('add-float-btn').style.display='flex';
-  document.getElementById('yt-container').style.display='none';
-  document.getElementById('yt-wrap').innerHTML='';
-};
-
-// ── LYRICS ────────────────────────────────────────────────────────────────────
-function renderLyrics(){
-  if (!currentSong) return;
-  const el = document.getElementById('lyr-content');
-  const sz = large ? ' large' : '';
-  const html = currentSong.lines.map((line,li) => {
-    const words = line.map((w,wi) => {
-      const hl = hlSet.has(li+'_'+wi) ? ' hl' : '';
-      return `<div class="word-card${hl}" onclick="tapWord(${li},${wi})">
-        <div class="w-heb">${w.hebrew}</div>
-        <div class="w-tr${showTr?'':' hide'}">${w.transliteration}</div>
-        <div class="w-trans${showEn?'':' hide'}">${w.translation}</div>
-      </div>`;
-    }).join('');
-    return `<div class="lyric-line${sz}">${words}</div>`;
-  }).join('');
-  el.innerHTML = html + `<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">🎵 ${currentSong.artist}</div>`;
-}
-
-function tapWord(li,wi){
-  const w = currentSong.lines[li][wi];
-  const k = li+'_'+wi;
-  const card = document.querySelectorAll('.lyric-line')[li]?.querySelectorAll('.word-card')[wi];
-  if(hlSet.has(k)){ hlSet.delete(k); card?.classList.remove('hl'); }
-  else{
-    hlSet.add(k); card?.classList.add('hl');
-    const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-    const wasNew = !learnedWords.has(h);
-    learnedWords.add(h); saveWords(); updateBadge();
-    if(wasNew) checkMilestone();
-  }
-}
-
-function toggleTranslit(){
-  showTr=!showTr;
-  document.getElementById('dot-tr').className='toggle'+(showTr?' on':'');
-  document.getElementById('t-tr').className='t-item'+(showTr?' on':'');
-  document.querySelectorAll('.w-tr').forEach(el=>el.classList.toggle('hide',!showTr));
-}
-function toggleTrans(){
-  showEn=!showEn;
-  document.getElementById('dot-en').className='toggle'+(showEn?' on':'');
-  document.getElementById('t-en').className='t-item'+(showEn?' on':'');
-  document.querySelectorAll('.w-trans').forEach(el=>el.classList.toggle('hide',!showEn));
-}
-function toggleSize(){
-  large=!large;
-  document.getElementById('size-btn').className='size-btn'+(large?' on':'');
-  document.getElementById('size-btn').textContent=large?'AA':'Aa';
-  renderLyrics();
-}
-
-// ── YOUTUBE ───────────────────────────────────────────────────────────────────
-function toggleYT(){
-  ytOn=!ytOn;
-  const c=document.getElementById('yt-container');
-  const b=document.getElementById('yt-btn');
-  if(ytOn){
-    c.style.display='block';
-    b.className='yt-btn off'; b.textContent='■ Stop';
-    const id=currentSong.youtubeId;
-    document.getElementById('yt-wrap').innerHTML=id
-      ? `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`
-      : '<div style="padding:20px;text-align:center;color:#aaa;">No video found</div>';
-  } else {
-    c.style.display='none';
-    document.getElementById('yt-wrap').innerHTML='';
-    b.className='yt-btn'; b.textContent='▶ Play';
-  }
-}
-
-// ── MILESTONES ────────────────────────────────────────────────────────────────
-function checkMilestone(){
-  const n=learnedWords.size;
-  const msgs={10:'🎉 10 words!',25:'⭐ 25 words!',50:'🔥 50 words!',100:'🏆 100 words!'};
-  if(msgs[n]){
-    const t=document.getElementById('toast');
-    t.textContent=msgs[n]; t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2000);
-    document.getElementById('words-badge').style.transform='scale(1.2)';
-    setTimeout(()=>document.getElementById('words-badge').style.transform='',400);
-  }
-}
-
-// ── QUIZ ──────────────────────────────────────────────────────────────────────
-// SRS data: {wordKey: {level:0-5, nextReview: timestamp, totalTime: ms, reviews: n}}
-let srsData = JSON.parse(localStorage.getItem('nema_srs') || '{}');
-function saveSRS() { localStorage.setItem('nema_srs', JSON.stringify(srsData)); }
-
-// SRS intervals in ms: [1min, 10min, 1hr, 1day, 3days, 7days]
-const SRS_INTERVALS = [60000, 600000, 3600000, 86400000, 259200000, 604800000];
-
-function getWordKey(s, li, wi) { return `${s}:${li}:${wi}`; }
-
-function getDueWords() {
-  const now = Date.now();
-  const all = [];
-  SONGS.forEach(s => {
-    s.lines.forEach((line, li) => {
-      line.forEach((w, wi) => {
-        const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-        if (h.length < 2) return;
-        const wd = getWord(s.id, li, wi, w);
-        if (wd.translation === wd.hebrew || wd.translation === wd.transliteration) return;
-        const key = getWordKey(s.id, li, wi);
-        const srs = srsData[key] || {level:0, nextReview:0, totalTime:0, reviews:0};
-        all.push({key, hebrew: wd.hebrew, transliteration: wd.transliteration,
-          translation: wd.translation, song: s.titleTranslit, srs,
-          isDue: srs.nextReview <= now});
-      });
-    });
-  });
-  // Sort: due first, then by level (lower = needs more practice)
-  all.sort((a,b) => {
-    if (a.isDue && !b.isDue) return -1;
-    if (!a.isDue && b.isDue) return 1;
-    return (a.srs.level - b.srs.level);
-  });
-  return all;
-}
-
-// Quiz modes
-const QUIZ_MODES = [
-  {id:'flip', label:'🃏 Flashcard', desc:'Hebrew → tap to reveal'},
-  {id:'type', label:'⌨️ Type it', desc:'English → type transliteration'},
-  {id:'streak', label:'🔥 Streak mode', desc:'Quick-fire cards'},
-];
-let quizMode = 'flip';
-let quizWords = [], quizIdx = 0, quizRevealed = false;
-let cardStartTime = 0;
-
-function buildQuiz() {
-  quizWords = getDueWords().slice(0, 40);
-  quizIdx = 0; quizRevealed = false;
-  renderQuizMode();
-}
-
-function renderQuizMode() {
-  const el = document.getElementById('quiz-content');
-  const dueCount = quizWords.filter(w => w.isDue).length;
-  el.innerHTML = `
-    <div style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:4px;">
-      ${dueCount > 0 ? `<span style="color:var(--gold);font-weight:700">${dueCount} due</span> · ` : ''}${quizWords.length} words total
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;">
-      ${QUIZ_MODES.map(m => `
-        <div onclick="selectMode('${m.id}')" style="background:${quizMode===m.id?'rgba(240,165,0,.15)':'var(--card)'};border:1.5px solid ${quizMode===m.id?'var(--gold)':'var(--border)'};border-radius:14px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;">
-          <div style="font-size:22px">${m.label.split(' ')[0]}</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;color:${quizMode===m.id?'var(--gold)':'var(--white)'}">${m.label.split(' ').slice(1).join(' ')}</div>
-            <div style="font-size:12px;color:var(--muted)">${m.desc}</div>
-          </div>
-        </div>`).join('')}
-    </div>
-    ${quizWords.length === 0
-      ? '<div style="text-align:center;color:var(--muted);padding:20px">🎵 Add some songs first!</div>'
-      : `<button onclick="startQuiz()" style="background:var(--gold);color:#000;border:none;border-radius:20px;padding:12px 32px;font-size:15px;font-weight:700;cursor:pointer;width:100%;max-width:340px;">Start →</button>`
-    }
-  `;
-}
-
-function selectMode(m) { quizMode = m; renderQuizMode(); }
-
-function startQuiz() {
-  quizIdx = 0; quizRevealed = false;
-  cardStartTime = Date.now();
-  renderCard();
-}
-
-function renderCard() {
-  const el = document.getElementById('quiz-content');
-  if (quizIdx >= quizWords.length) { showQuizDone(); return; }
-  const w = quizWords[quizIdx];
-  const prog = `${quizIdx+1}/${quizWords.length}`;
-  const lvl = w.srs.level;
-  const dots = Array.from({length:6},(_,i)=>`<span style="width:8px;height:8px;border-radius:50%;background:${i<=lvl?'var(--gold)':'var(--border)'}"></span>`).join('');
-  cardStartTime = Date.now();
-
-  if (quizMode === 'type') {
-    // Show English → type transliteration
-    el.innerHTML = `
-      <div style="font-size:13px;color:var(--muted)">${prog} · from ${w.song}</div>
-      <div style="display:flex;gap:4px;justify-content:center">${dots}</div>
-      <div class="quiz-card" id="qcard" style="min-height:160px">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">What is the transliteration of...</div>
-        <div style="font-size:28px;font-weight:700;color:var(--white);text-align:center;margin-bottom:4px">${w.translation}</div>
-        <div style="font-size:13px;color:var(--muted)">(Hebrew word)</div>
-      </div>
-      <input id="type-input" placeholder="Type transliteration..." 
-        style="width:100%;max-width:340px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--white);font-size:16px;outline:none;text-align:center;"
-        onkeydown="if(event.key==='Enter')checkType()"
-        oninput="this.style.borderColor='var(--border)'">
-      <button onclick="checkType()" class="q-btn next" style="width:100%;max-width:340px">Check →</button>
-      <div id="type-feedback" style="text-align:center;font-size:14px;min-height:20px"></div>
-    `;
-    setTimeout(() => document.getElementById('type-input')?.focus(), 100);
-
-  } else {
-    // Flashcard mode (flip / streak)
-    el.innerHTML = `
-      <div style="font-size:13px;color:var(--muted)">${prog} · from ${w.song}</div>
-      <div style="display:flex;gap:4px;justify-content:center">${dots}</div>
-      <div class="quiz-card${quizRevealed?' revealed':''}" id="qcard" onclick="revealCard()">
-        <div class="quiz-heb${w.hebrew.length>8?' sm':''}">${w.hebrew}</div>
-        <div class="quiz-tr">${w.transliteration}</div>
-        <div class="quiz-trans">${w.translation}</div>
-        <div class="quiz-hint">Tap to reveal</div>
-      </div>
-      ${quizRevealed ? `
-        <div style="color:var(--muted);font-size:13px;text-align:center">How well did you know this?</div>
-        <div style="display:flex;gap:8px;width:100%;max-width:340px">
-          <button onclick="rateCard(0)" style="flex:1;padding:10px;border-radius:12px;border:1px solid #ff4444;background:rgba(255,68,68,.1);color:#ff6666;font-size:13px;cursor:pointer">😵 Hard</button>
-          <button onclick="rateCard(2)" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--white);font-size:13px;cursor:pointer">😐 OK</button>
-          <button onclick="rateCard(4)" style="flex:1;padding:10px;border-radius:12px;border:1px solid #44cc44;background:rgba(68,204,68,.1);color:#66cc66;font-size:13px;cursor:pointer">😄 Easy</button>
-        </div>
-      ` : `<button onclick="revealCard()" class="q-btn next" style="width:100%;max-width:340px">Reveal →</button>`}
-    `;
-  }
-}
-
-function revealCard() {
-  quizRevealed = true;
-  const elapsed = Date.now() - cardStartTime;
-  // Track time spent on card
-  const w = quizWords[quizIdx];
-  if (!srsData[w.key]) srsData[w.key] = {level:0, nextReview:0, totalTime:0, reviews:0};
-  srsData[w.key].totalTime = (srsData[w.key].totalTime || 0) + elapsed;
-  renderCard();
-}
-
-function rateCard(rating) {
-  // rating: 0=hard, 2=ok, 4=easy
-  const w = quizWords[quizIdx];
-  const srs = srsData[w.key] || {level:0, nextReview:0, totalTime:0, reviews:0};
-  
-  // Update level based on rating
-  if (rating === 0) srs.level = Math.max(0, srs.level - 1);
-  else if (rating === 2) srs.level = Math.min(5, srs.level + 1);
-  else if (rating === 4) srs.level = Math.min(5, srs.level + 2);
-  
-  srs.reviews = (srs.reviews || 0) + 1;
-  srs.nextReview = Date.now() + SRS_INTERVALS[srs.level];
-  srsData[w.key] = srs;
-  saveSRS();
-
-  // Mark as learned
-  const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-  learnedWords.add(h); saveWords(); updateBadge(); checkMilestone();
-
-  quizIdx++; quizRevealed = false; renderCard();
-}
-
-function checkType() {
-  const input = document.getElementById('type-input');
-  const feedback = document.getElementById('type-feedback');
-  if (!input) return;
-  
-  const answer = input.value.trim().toLowerCase();
-  const w = quizWords[quizIdx];
-  const correct = w.transliteration.toLowerCase();
-  const elapsed = Date.now() - cardStartTime;
-  
-  const srs = srsData[w.key] || {level:0, nextReview:0, totalTime:0, reviews:0};
-  srs.totalTime = (srs.totalTime || 0) + elapsed;
-  srs.reviews = (srs.reviews || 0) + 1;
-
-  // Fuzzy match: allow small typos
-  const isClose = answer === correct || 
-    answer.replace(/['\`]/g,'') === correct.replace(/['\`]/g,'') ||
-    levenshtein(answer, correct) <= 1;
-
-  if (isClose) {
-    srs.level = Math.min(5, srs.level + (answer === correct ? 2 : 1));
-    srs.nextReview = Date.now() + SRS_INTERVALS[srs.level];
-    input.style.borderColor = '#44cc44';
-    feedback.innerHTML = `<span style="color:#66cc66">✓ ${answer === correct ? 'Perfect!' : `Close enough! (${correct})`}</span>`;
-    const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-    learnedWords.add(h); saveWords(); updateBadge(); checkMilestone();
-    srsData[w.key] = srs; saveSRS();
-    setTimeout(() => { quizIdx++; quizRevealed = false; renderCard(); }, 1200);
-  } else {
-    srs.level = Math.max(0, srs.level - 1);
-    srs.nextReview = Date.now() + SRS_INTERVALS[0];
-    input.style.borderColor = '#ff4444';
-    feedback.innerHTML = `<span style="color:#ff6666">✗ Answer: <strong>${correct}</strong></span>`;
-    srsData[w.key] = srs; saveSRS();
-    setTimeout(() => { input.value=''; input.style.borderColor='var(--border)'; feedback.innerHTML=''; input.focus(); }, 2000);
-  }
-}
-
-function levenshtein(a, b) {
-  const m = a.length, n = b.length;
-  const dp = Array.from({length:m+1}, (_,i) => Array.from({length:n+1}, (_,j) => i===0?j:j===0?i:0));
-  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
-    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
-  return dp[m][n];
-}
-
-function showQuizDone() {
-  const el = document.getElementById('quiz-content');
-  // Stats
-  const reviewed = quizWords.length;
-  const avgLevel = quizWords.reduce((s,w) => s + (srsData[w.key]?.level || 0), 0) / reviewed;
-  const avgTime = quizWords.reduce((s,w) => s + (srsData[w.key]?.totalTime || 0), 0) / reviewed;
-  
-  el.innerHTML = `
-    <div style="text-align:center;padding:20px">
-      <div style="font-size:48px;margin-bottom:12px">🏆</div>
-      <div style="color:var(--gold);font-size:22px;font-weight:700">Session done!</div>
-      <div style="color:var(--muted);margin-top:8px;font-size:13px">${reviewed} cards reviewed</div>
-      <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
-        <div class="quiz-stat"><div class="quiz-stat-n">${learnedWords.size}</div><div class="quiz-stat-l">total learned</div></div>
-        <div class="quiz-stat"><div class="quiz-stat-n">${Math.round(avgTime/1000)}s</div><div class="quiz-stat-l">avg per card</div></div>
-        <div class="quiz-stat"><div class="quiz-stat-n">${Math.round(avgLevel*10)/10}</div><div class="quiz-stat-l">avg level</div></div>
-      </div>
-      <button onclick="buildQuiz()" style="margin-top:20px;background:rgba(240,165,0,.15);border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">Go again →</button>
-    </div>
-  `;
-}
-
-// Keep old aliases for compatibility
-function nextQuiz() { if (quizIdx < quizWords.length-1) { quizIdx++; quizRevealed=false; renderCard(); } }
-function prevQuiz() { if (quizIdx > 0) { quizIdx--; quizRevealed=false; renderCard(); } }
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-// Scripts are at bottom of body, DOM is ready
-updateBadge();
-renderGenres();
-renderSongs();
-</script>
-
-<!-- Edit Popup -->
-<div id="edit-popup" class="edit-popup" style="display:none;" onclick="closeEdit(event)">
+<!-- EDIT POPUP -->
+<div class="edit-popup" id="edit-popup" style="display:none">
   <div class="edit-box">
-    <div class="edit-title">✏️ Edit translation</div>
-    <div class="edit-hebrew" id="edit-hebrew"></div>
-    <div class="edit-field">
-      <div class="edit-label">Transliteration</div>
-      <input class="edit-input" id="edit-tr-input" placeholder="e.g. shalom">
-    </div>
-    <div class="edit-field">
-      <div class="edit-label">English translation</div>
-      <input class="edit-input" id="edit-en-input" placeholder="e.g. peace / hello">
-    </div>
-    <div class="edit-actions">
-      <button class="edit-cancel" onclick="closeEdit()">Cancel</button>
-      <button class="edit-save" onclick="saveEdit()">Save ✓</button>
+    <div style="color:var(--gold);font-size:16px;font-weight:700;text-align:center">✏️ Edit translation</div>
+    <div style="font-family:'Frank Ruhl Libre',serif;font-size:32px;color:var(--gold);text-align:center" id="edit-heb"></div>
+    <div><div class="ml">Transliteration</div><input class="mi" id="edit-tr-in" placeholder="e.g. shalom"></div>
+    <div><div class="ml">English translation</div><input class="mi" id="edit-en-in" placeholder="e.g. peace"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeEdit()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--bdr);background:var(--card);color:var(--muted);cursor:pointer">Cancel</button>
+      <button onclick="saveEdit()" style="flex:2;padding:12px;border-radius:12px;border:1px solid var(--gold);background:rgba(240,165,0,.15);color:var(--gold);font-weight:700;cursor:pointer">Save ✓</button>
     </div>
   </div>
 </div>
 
-
-<!-- Float Add Button (only on songs tab) -->
-<button class="add-btn-float" id="add-float-btn" onclick="openAddSong()" title="Add song">+</button>
-
-<!-- Add Song Modal -->
-<div class="add-modal" id="add-modal">
-  <div class="add-box">
-    <div class="add-title">➕ Add Song</div>
-
-    <div class="add-field">
-      <div class="add-label">Song title (Hebrew)</div>
-      <input class="add-input" id="add-title-he" placeholder="e.g. הולך בטל" dir="rtl">
+<!-- ADD SONG BUTTON + MODAL -->
+<button class="add-float" id="add-float" onclick="document.getElementById('add-modal').classList.add('open')" title="Add song">+</button>
+<div class="modal-bg" id="add-modal">
+  <div class="modal-box">
+    <div style="color:var(--gold);font-size:18px;font-weight:700;text-align:center">➕ Add Song</div>
+    <div><div class="ml">Hebrew title</div><input class="mi" id="a-title-he" dir="rtl" placeholder="הולך בטל"></div>
+    <div><div class="ml">English / transliteration</div><input class="mi" id="a-title-en" placeholder="Holech Batel"></div>
+    <div><div class="ml">Artist (Hebrew)</div><input class="mi" id="a-art-he" dir="rtl" placeholder="תמוז"></div>
+    <div><div class="ml">Artist (English)</div><input class="mi" id="a-art-en" placeholder="Tamuz"></div>
+    <div><div class="ml">Year</div><input class="mi" id="a-year" type="number" placeholder="1984"></div>
+    <div>
+      <div class="ml">Lyrics (Hebrew, one line per row)</div>
+      <textarea class="mi" id="a-lyrics" placeholder="הולך בטל, הולך&#10;הולך בטל&#10;הרחובות נותנים לו"></textarea>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">💡 Each line = one lyrics line. Edit translations word by word after adding.</div>
     </div>
-    <div class="add-field">
-      <div class="add-label">Title (English / transliteration)</div>
-      <input class="add-input" id="add-title-en" placeholder="e.g. Holech Batel">
-    </div>
-    <div class="add-field">
-      <div class="add-label">Artist (Hebrew)</div>
-      <input class="add-input" id="add-artist-he" placeholder="e.g. תמוז" dir="rtl">
-    </div>
-    <div class="add-field">
-      <div class="add-label">Artist (English)</div>
-      <input class="add-input" id="add-artist-en" placeholder="e.g. Tamuz">
-    </div>
-    <div class="add-field">
-      <div class="add-label">Year</div>
-      <input class="add-input" id="add-year" placeholder="e.g. 1984" type="number">
-    </div>
-    <div class="add-field">
-      <div class="add-label">Lyrics (Hebrew, one line per row)</div>
-      <textarea class="add-textarea" id="add-lyrics" placeholder="הולך בטל, הולך
-הולך בטל
-הרחובות נותנים לו
-זמן בלי חשבונות"></textarea>
-      <div class="add-hint">💡 Each line will become a separate lyrics line. Transliteration & translation will be auto-generated (you can edit them later).</div>
-    </div>
-    <div class="add-status" id="add-status"></div>
-    <div class="add-actions">
-      <button class="add-cancel" onclick="closeAddSong()">Cancel</button>
-      <button class="add-save" onclick="submitAddSong()">Add Song ✓</button>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('add-modal').classList.remove('open')" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--bdr);background:var(--card);color:var(--muted);cursor:pointer">Cancel</button>
+      <button onclick="addSong()" style="flex:2;padding:12px;border-radius:12px;border:1px solid var(--gold);background:rgba(240,165,0,.15);color:var(--gold);font-weight:700;cursor:pointer">Add ✓</button>
     </div>
   </div>
 </div>
 
 <script src="songs.js"></script>
 <script>
-// SONGS loaded from songs.js
+const GENRES=['All','⭐ Fav','Rock','Pop','Folk','Indie'];
+const MILESTONES=[10,25,50,100];
+const SRS_INT=[60000,600000,3600000,86400000,259200000,604800000];
 
-const GENRES = ['All', '⭐ Fav', 'Rock', 'Pop', 'Folk', 'Indie'];
-const MILESTONES = [10,25,50,100];
+let cur=null, showTr=true, showEn=true, large=false, ytOn=false, hlSet=new Set();
+let activeG='All', searchQ='';
+let learned=new Set(JSON.parse(localStorage.getItem('nema_w')||'[]'));
+let favs=new Set(JSON.parse(localStorage.getItem('nema_f')||'[]'));
+let edits=JSON.parse(localStorage.getItem('nema_e')||'{}');
+let srs=JSON.parse(localStorage.getItem('nema_srs')||'{}');
+let qWords=[],qIdx=0,qRev=false,qMode='flip',cardT=0;
+let customSongs=JSON.parse(localStorage.getItem('nema_c')||'[]');
 
-let currentSong = null;
-let showTr = true, showEn = true, large = false, ytOn = false;
-let hlSet = new Set();
-let activeGenre = 'All';
-let searchQ = '';
-let learnedWords = new Set(JSON.parse(localStorage.getItem('lishon_words') || '[]'));
-let favorites = new Set(JSON.parse(localStorage.getItem('lishon_favs') || '[]'));
-let currentTab = 'songs';
-let quizWords = [], quizIdx = 0, quizRevealed = false;
+// Load custom songs into SONGS array
+customSongs.forEach(s=>{if(!SONGS.find(x=>x.id===s.id))SONGS.push(s);});
 
-function saveWords(){ localStorage.setItem('lishon_words', JSON.stringify([...learnedWords])); }
-function saveFavs(){ localStorage.setItem('lishon_favs', JSON.stringify([...favorites])); }
+function saveW(){localStorage.setItem('nema_w',JSON.stringify([...learned]));}
+function saveF(){localStorage.setItem('nema_f',JSON.stringify([...favs]));}
+function saveE(){localStorage.setItem('nema_e',JSON.stringify(edits));}
+function saveSRS(){localStorage.setItem('nema_srs',JSON.stringify(srs));}
+function saveC(){localStorage.setItem('nema_c',JSON.stringify(customSongs));}
 
-function updateBadge(){
-  document.getElementById('words-badge').textContent = `✨ ${learnedWords.size} words`;
+function badge(){document.getElementById('badge').textContent=`✨ ${learned.size} words`;}
+
+function wd(songId,li,wi,w){
+  const k=`${songId}:${li}:${wi}`;
+  return edits[k]?{...w,...edits[k]}:w;
 }
 
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function switchTab(tab){
-  currentTab = tab;
-  document.getElementById('tab-songs').className = 'tab-btn' + (tab==='songs' ? ' active' : '');
-  document.getElementById('tab-quiz').className = 'tab-btn' + (tab==='quiz' ? ' active' : '');
-  document.getElementById('songs-tab').style.display = tab==='songs' ? 'block' : 'none';
-  document.getElementById('quiz-tab').style.display = tab==='quiz' ? 'block' : 'none';
-  if (tab==='quiz') buildQuiz();
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(t){
+  document.getElementById('tab-songs').className='tab'+(t==='songs'?' on':'');
+  document.getElementById('tab-quiz').className='tab'+(t==='quiz'?' on':'');
+  document.getElementById('songs-tab').style.display=t==='songs'?'block':'none';
+  document.getElementById('quiz-tab').style.display=t==='quiz'?'block':'none';
+  if(t==='quiz')buildQuiz();
 }
 
-// ── GENRES ────────────────────────────────────────────────────────────────────
+// ── GENRES ────────────────────────────────────────────────────
 function renderGenres(){
-  document.getElementById('genres').innerHTML = GENRES.map(g =>
-    `<div class="genre-chip ${g===activeGenre?'active':''}" onclick="setGenre('${g}')">${g}</div>`
+  document.getElementById('genres').innerHTML=GENRES.map(g=>
+    `<div class="chip${g===activeG?' on':''}" onclick="setG('${g}')">${g}</div>`
   ).join('');
 }
+function setG(g){activeG=g;renderGenres();renderSongs();}
 
-function setGenre(g){ activeGenre=g; renderGenres(); renderSongs(); }
-
-// ── SONGS ─────────────────────────────────────────────────────────────────────
-document.getElementById('search-input').addEventListener('input', e => {
-  searchQ = e.target.value; renderSongs();
-});
+// ── SONGS ─────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input',e=>{searchQ=e.target.value;renderSongs();});
 
 function renderSongs(){
-  const q = searchQ.toLowerCase();
-  const filtered = SONGS.filter(s => {
-    const ms = !q || s.title.includes(searchQ) || s.titleTranslit.toLowerCase().includes(q) || s.artistEn.toLowerCase().includes(q);
-    const mg = activeGenre==='All' || (activeGenre==='⭐ Fav' && favorites.has(s.id)) || s.genreEn.toLowerCase().includes(activeGenre.toLowerCase());
-    return ms && mg;
+  const q=searchQ.toLowerCase();
+  const list=SONGS.filter(s=>{
+    const ms=!q||s.title.includes(searchQ)||s.titleTranslit.toLowerCase().includes(q)||s.artistEn.toLowerCase().includes(q);
+    const mg=activeG==='All'||(activeG==='⭐ Fav'&&favs.has(s.id))||s.genreEn.toLowerCase().includes(activeG.toLowerCase());
+    return ms&&mg;
   });
-  const el = document.getElementById('song-list');
-  if (!filtered.length) { el.innerHTML='<div class="empty-state">🎵 No songs found</div>'; return; }
-  const wc = s => s.lines.reduce((a,l)=>a+l.length,0);
-  el.innerHTML = filtered.map(s => `
-    <div class="song-card" onclick="openSong('${s.id}')">
+  const el=document.getElementById('song-list');
+  if(!list.length){el.innerHTML='<div class="empty">🎵 No songs found</div>';return;}
+  const wc=s=>s.lines.reduce((a,l)=>a+l.length,0);
+  el.innerHTML=list.map(s=>`
+    <div class="scard" onclick="openSong('${s.id}')">
       <div class="cover" style="background:${s.coverColor}"><span class="cover-letter">${s.title[0]}</span></div>
-      <div class="song-info">
-        <div class="song-title-he">${s.title}</div>
-        <div class="song-title-tr">${s.titleTranslit}</div>
-        <div class="song-artist">${s.artistEn}</div>
-        <div class="song-meta">
-          <span class="tag">${s.genreEn}</span>
-          <span class="tag">${s.year}</span>
-          <span class="tag">${wc(s)} words</span>
-        </div>
+      <div class="sinfo">
+        <div class="s-he">${s.title}</div>
+        <div class="s-tr">${s.titleTranslit}</div>
+        <div class="s-art">${s.artistEn}</div>
+        <div class="s-meta"><span class="tag">${s.genreEn}</span><span class="tag">${s.year}</span><span class="tag">${wc(s)} words</span></div>
       </div>
-      <button class="fav-btn" onclick="toggleFav('${s.id}',event)">${favorites.has(s.id)?'⭐':'☆'}</button>
+      <button class="fav-btn" onclick="toggleFav('${s.id}',event)">${favs.has(s.id)?'⭐':'☆'}</button>
       <div class="chevron">›</div>
     </div>`).join('');
 }
 
-function toggleFav(id,e){ e.stopPropagation(); favorites.has(id)?favorites.delete(id):favorites.add(id); saveFavs(); renderSongs(); updateLyrFav(); }
-function toggleFavFromLyrics(){ if(currentSong) toggleFav(currentSong.id, {stopPropagation:()=>{}}); }
-function updateLyrFav(){ const b=document.getElementById('lyr-fav-btn'); if(b&&currentSong) b.textContent=favorites.has(currentSong.id)?'⭐':'☆'; }
+function toggleFav(id,e){e.stopPropagation();favs.has(id)?favs.delete(id):favs.add(id);saveF();renderSongs();updLyrFav();}
+function toggleFavLyrics(){if(cur)toggleFav(cur.id,{stopPropagation:()=>{}});}
+function updLyrFav(){const b=document.getElementById('lyr-fav');if(b&&cur)b.textContent=favs.has(cur.id)?'⭐':'☆';}
 
-// ── OPEN SONG ─────────────────────────────────────────────────────────────────
+// ── OPEN SONG ─────────────────────────────────────────────────
 function openSong(id){
-  currentSong = SONGS.find(s=>s.id===id);
-  hlSet = new Set(); showTr=true; showEn=true; large=false; ytOn=false;
-  document.getElementById('dot-tr').className='toggle on';
-  document.getElementById('dot-en').className='toggle on';
-  document.getElementById('t-tr').className='t-item on';
-  document.getElementById('t-en').className='t-item on';
-  document.getElementById('size-btn').className='size-btn';
+  cur=SONGS.find(s=>s.id===id);
+  hlSet=new Set();showTr=true;showEn=true;large=false;ytOn=false;
+  document.getElementById('dot-tr').className='tog on';
+  document.getElementById('dot-en').className='tog on';
+  document.getElementById('ti-tr').className='ti on';
+  document.getElementById('ti-en').className='ti on';
+  document.getElementById('sz-btn').className='sz-btn';
+  document.getElementById('sz-btn').textContent='Aa';
   document.getElementById('yt-btn').className='yt-btn';
+  document.getElementById('yt-btn').textContent='▶ Play';
   document.getElementById('yt-container').style.display='none';
   document.getElementById('yt-wrap').innerHTML='';
-  document.getElementById('lyr-title').textContent=currentSong.title;
-  document.getElementById('lyr-artist').textContent=currentSong.artistEn+' · '+currentSong.year;
-  document.getElementById('hero').style.background=currentSong.coverColor;
+  document.getElementById('lyr-title').textContent=cur.title;
+  document.getElementById('lyr-artist').textContent=cur.artistEn+' · '+cur.year;
+  document.getElementById('hero').style.background=cur.coverColor;
   document.getElementById('hero').innerHTML=`
-    <div class="hero-title">${currentSong.title}</div>
-    <div class="hero-tr">${currentSong.titleTranslit}</div>
-    <div class="hero-en">${currentSong.titleEn}</div>
-    <div class="hero-meta">
-      <span class="hero-pill">${currentSong.artistEn}</span>
-      <span class="hero-pill">${currentSong.year}</span>
-      <span class="hero-pill">${currentSong.genreEn}</span>
-    </div>`;
-  updateLyrFav();
-  renderLyrics();
+    <div class="hero-title">${cur.title}</div>
+    <div class="hero-tr">${cur.titleTranslit}</div>
+    <div class="hero-en">${cur.titleEn}</div>
+    <div class="hero-meta"><span class="pill">${cur.artistEn}</span><span class="pill">${cur.year}</span><span class="pill">${cur.genreEn}</span></div>`;
+  updLyrFav();renderLyrics();
   document.getElementById('home').classList.add('hidden');
-  document.getElementById('add-float-btn').style.display='none';
   document.getElementById('lyrics').classList.remove('hidden');
   document.getElementById('lyrics').scrollTop=0;
-  localStorage.setItem('lishon_last', id);
+  document.getElementById('add-float').style.display='none';
 }
 
-document.getElementById('back-btn').onclick = () => {
+document.getElementById('back-btn').onclick=()=>{
   document.getElementById('lyrics').classList.add('hidden');
   document.getElementById('home').classList.remove('hidden');
-  document.getElementById('add-float-btn').style.display='flex';
   document.getElementById('yt-container').style.display='none';
   document.getElementById('yt-wrap').innerHTML='';
+  document.getElementById('add-float').style.display='flex';
 };
 
-// ── LYRICS ────────────────────────────────────────────────────────────────────
+// ── LYRICS ────────────────────────────────────────────────────
 function renderLyrics(){
-  if (!currentSong) return;
-  const el = document.getElementById('lyr-content');
-  const sz = large ? ' large' : '';
-  const html = currentSong.lines.map((line,li) => {
-    const words = line.map((w,wi) => {
-      const hl = hlSet.has(li+'_'+wi) ? ' hl' : '';
-      return `<div class="word-card${hl}" onclick="tapWord(${li},${wi})">
-        <div class="w-heb">${w.hebrew}</div>
-        <div class="w-tr${showTr?'':' hide'}">${w.transliteration}</div>
-        <div class="w-trans${showEn?'':' hide'}">${w.translation}</div>
-      </div>`;
-    }).join('');
-    return `<div class="lyric-line${sz}">${words}</div>`;
-  }).join('');
-  el.innerHTML = html + `<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">🎵 ${currentSong.artist}</div>`;
+  if(!cur)return;
+  const sz=large?' large':'';
+  document.getElementById('lyr-content').innerHTML=
+    cur.lines.map((line,li)=>{
+      const words=line.map((w,wi)=>{
+        const wo=wd(cur.id,li,wi,w);
+        const hl=hlSet.has(li+'_'+wi)?' hl':'';
+        return `<div class="wcard${hl}" onclick="tapWord(${li},${wi})">
+          <div class="edit-icon" onclick="openEdit(${li},${wi},event)">✏</div>
+          <div class="w-he">${wo.hebrew}</div>
+          <div class="w-tr${showTr?'':' hide'}">${wo.transliteration}</div>
+          <div class="w-en${showEn?'':' hide'}">${wo.translation}</div>
+        </div>`;
+      }).join('');
+      return `<div class="lyric-line${sz}">${words}</div>`;
+    }).join('')+`<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">🎵 ${cur.artist}</div>`;
 }
 
 function tapWord(li,wi){
-  const w = currentSong.lines[li][wi];
-  const k = li+'_'+wi;
-  const card = document.querySelectorAll('.lyric-line')[li]?.querySelectorAll('.word-card')[wi];
-  if(hlSet.has(k)){ hlSet.delete(k); card?.classList.remove('hl'); }
+  const w=cur.lines[li][wi];
+  const k=li+'_'+wi;
+  const card=document.querySelectorAll('.lyric-line')[li]?.querySelectorAll('.wcard')[wi];
+  if(hlSet.has(k)){hlSet.delete(k);card?.classList.remove('hl');}
   else{
-    hlSet.add(k); card?.classList.add('hl');
-    const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-    const wasNew = !learnedWords.has(h);
-    learnedWords.add(h); saveWords(); updateBadge();
-    if(wasNew) checkMilestone();
+    hlSet.add(k);card?.classList.add('hl');
+    const h=w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
+    const isNew=!learned.has(h);
+    learned.add(h);saveW();badge();
+    if(isNew)milestone();
   }
 }
 
-function toggleTranslit(){
-  showTr=!showTr;
-  document.getElementById('dot-tr').className='toggle'+(showTr?' on':'');
-  document.getElementById('t-tr').className='t-item'+(showTr?' on':'');
-  document.querySelectorAll('.w-tr').forEach(el=>el.classList.toggle('hide',!showTr));
-}
-function toggleTrans(){
-  showEn=!showEn;
-  document.getElementById('dot-en').className='toggle'+(showEn?' on':'');
-  document.getElementById('t-en').className='t-item'+(showEn?' on':'');
-  document.querySelectorAll('.w-trans').forEach(el=>el.classList.toggle('hide',!showEn));
-}
-function toggleSize(){
-  large=!large;
-  document.getElementById('size-btn').className='size-btn'+(large?' on':'');
-  document.getElementById('size-btn').textContent=large?'AA':'Aa';
-  renderLyrics();
-}
+function toggleTr(){showTr=!showTr;document.getElementById('dot-tr').className='tog'+(showTr?' on':'');document.getElementById('ti-tr').className='ti'+(showTr?' on':'');document.querySelectorAll('.w-tr').forEach(e=>e.classList.toggle('hide',!showTr));}
+function toggleEn(){showEn=!showEn;document.getElementById('dot-en').className='tog'+(showEn?' on':'');document.getElementById('ti-en').className='ti'+(showEn?' on':'');document.querySelectorAll('.w-en').forEach(e=>e.classList.toggle('hide',!showEn));}
+function toggleSz(){large=!large;document.getElementById('sz-btn').className='sz-btn'+(large?' on':'');document.getElementById('sz-btn').textContent=large?'AA':'Aa';renderLyrics();}
 
-// ── YOUTUBE ───────────────────────────────────────────────────────────────────
 function toggleYT(){
   ytOn=!ytOn;
   const c=document.getElementById('yt-container');
   const b=document.getElementById('yt-btn');
   if(ytOn){
-    c.style.display='block';
-    b.className='yt-btn off'; b.textContent='■ Stop';
-    const id=currentSong.youtubeId;
+    c.style.display='block';b.className='yt-btn off';b.textContent='■ Stop';
+    const id=cur.youtubeId;
     document.getElementById('yt-wrap').innerHTML=id
-      ? `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`
-      : '<div style="padding:20px;text-align:center;color:#aaa;">No video found</div>';
-  } else {
-    c.style.display='none';
-    document.getElementById('yt-wrap').innerHTML='';
-    b.className='yt-btn'; b.textContent='▶ Play';
-  }
+      ?`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`
+      :'<div style="padding:20px;text-align:center;color:#aaa">No video</div>';
+  }else{c.style.display='none';document.getElementById('yt-wrap').innerHTML='';b.className='yt-btn';b.textContent='▶ Play';}
 }
 
-// ── MILESTONES ────────────────────────────────────────────────────────────────
-function checkMilestone(){
-  const n=learnedWords.size;
+// ── EDIT ──────────────────────────────────────────────────────
+let editTarget=null;
+function openEdit(li,wi,e){
+  e.stopPropagation();editTarget={li,wi};
+  const w=cur.lines[li][wi];
+  const k=`${cur.id}:${li}:${wi}`;
+  const ov=edits[k]||{};
+  document.getElementById('edit-heb').textContent=w.hebrew;
+  document.getElementById('edit-tr-in').value=ov.transliteration||w.transliteration;
+  document.getElementById('edit-en-in').value=ov.translation||w.translation;
+  document.getElementById('edit-popup').style.display='flex';
+  setTimeout(()=>document.getElementById('edit-tr-in').focus(),100);
+}
+function closeEdit(){document.getElementById('edit-popup').style.display='none';editTarget=null;}
+function saveEdit(){
+  if(!editTarget||!cur)return;
+  const{li,wi}=editTarget;
+  const k=`${cur.id}:${li}:${wi}`;
+  edits[k]={transliteration:document.getElementById('edit-tr-in').value.trim(),translation:document.getElementById('edit-en-in').value.trim()};
+  saveE();closeEdit();renderLyrics();
+}
+
+// ── MILESTONES ────────────────────────────────────────────────
+function milestone(){
+  const n=learned.size;
   const msgs={10:'🎉 10 words!',25:'⭐ 25 words!',50:'🔥 50 words!',100:'🏆 100 words!'};
-  if(msgs[n]){
-    const t=document.getElementById('toast');
-    t.textContent=msgs[n]; t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2000);
-    document.getElementById('words-badge').style.transform='scale(1.2)';
-    setTimeout(()=>document.getElementById('words-badge').style.transform='',400);
-  }
+  if(msgs[n]){const t=document.getElementById('toast');t.textContent=msgs[n];t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 }
 
-// ── QUIZ ──────────────────────────────────────────────────────────────────────
-// SRS data: {wordKey: {level:0-5, nextReview: timestamp, totalTime: ms, reviews: n}}
-let srsData = JSON.parse(localStorage.getItem('nema_srs') || '{}');
-function saveSRS() { localStorage.setItem('nema_srs', JSON.stringify(srsData)); }
-
-// SRS intervals in ms: [1min, 10min, 1hr, 1day, 3days, 7days]
-const SRS_INTERVALS = [60000, 600000, 3600000, 86400000, 259200000, 604800000];
-
-function getWordKey(s, li, wi) { return `${s}:${li}:${wi}`; }
-
-function getDueWords() {
-  const now = Date.now();
-  const all = [];
-  SONGS.forEach(s => {
-    s.lines.forEach((line, li) => {
-      line.forEach((w, wi) => {
-        const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-        if (h.length < 2) return;
-        const wd = getWord(s.id, li, wi, w);
-        if (wd.translation === wd.hebrew || wd.translation === wd.transliteration) return;
-        const key = getWordKey(s.id, li, wi);
-        const srs = srsData[key] || {level:0, nextReview:0, totalTime:0, reviews:0};
-        all.push({key, hebrew: wd.hebrew, transliteration: wd.transliteration,
-          translation: wd.translation, song: s.titleTranslit, srs,
-          isDue: srs.nextReview <= now});
-      });
-    });
-  });
-  // Sort: due first, then by level (lower = needs more practice)
-  all.sort((a,b) => {
-    if (a.isDue && !b.isDue) return -1;
-    if (!a.isDue && b.isDue) return 1;
-    return (a.srs.level - b.srs.level);
-  });
-  return all;
+// ── ADD SONG ──────────────────────────────────────────────────
+function addSong(){
+  const he=document.getElementById('a-title-he').value.trim();
+  const lyricsRaw=document.getElementById('a-lyrics').value.trim();
+  if(!he||!lyricsRaw){alert('Hebrew title and lyrics required');return;}
+  const lines=lyricsRaw.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('('));
+  const parsed=lines.map(line=>line.split(/\s+/).filter(w=>w).map((w,i,arr)=>({hebrew:w,transliteration:w,translation:w,lineBreak:i===arr.length-1})));
+  const colors=['#2d4a6e','#c8a96e','#6e8c4a','#e87d20','#4a2d6e','#c84a6e'];
+  const s={id:'custom-'+Date.now(),title:he,titleTranslit:document.getElementById('a-title-en').value||he,titleEn:document.getElementById('a-title-en').value||he,artist:document.getElementById('a-art-he').value||'Unknown',artistEn:document.getElementById('a-art-en').value||'Unknown',year:parseInt(document.getElementById('a-year').value)||2024,genre:'פופ',genreEn:'Custom',spotifyId:null,coverColor:colors[Math.floor(Math.random()*colors.length)],lines:parsed,youtubeId:null};
+  customSongs.push(s);saveC();SONGS.push(s);renderSongs();
+  document.getElementById('add-modal').classList.remove('open');
+  ['a-title-he','a-title-en','a-art-he','a-art-en','a-year','a-lyrics'].forEach(id=>document.getElementById(id).value='');
 }
 
-// Quiz modes
-const QUIZ_MODES = [
-  {id:'flip', label:'🃏 Flashcard', desc:'Hebrew → tap to reveal'},
-  {id:'type', label:'⌨️ Type it', desc:'English → type transliteration'},
-  {id:'streak', label:'🔥 Streak mode', desc:'Quick-fire cards'},
-];
-let quizMode = 'flip';
-let quizWords = [], quizIdx = 0, quizRevealed = false;
-let cardStartTime = 0;
-
-function buildQuiz() {
-  quizWords = getDueWords().slice(0, 40);
-  quizIdx = 0; quizRevealed = false;
-  renderQuizMode();
+// ── QUIZ ──────────────────────────────────────────────────────
+function buildQuiz(){
+  const now=Date.now();
+  const map={};
+  SONGS.forEach(s=>s.lines.forEach((line,li)=>line.forEach((w,wi)=>{
+    const h=w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
+    if(h.length<2)return;
+    const wo=wd(s.id,li,wi,w);
+    if(wo.translation===wo.hebrew)return;
+    const k=`${s.id}:${li}:${wi}`;
+    if(!map[k])map[k]={k,hebrew:wo.hebrew,transliteration:wo.transliteration,translation:wo.translation,song:s.titleTranslit,srs:srs[k]||{lvl:0,next:0,t:0,n:0},isDue:(srs[k]?.next||0)<=now};
+  })));
+  qWords=Object.values(map).sort((a,b)=>a.isDue!==b.isDue?b.isDue-a.isDue:a.srs.lvl-b.srs.lvl).slice(0,50);
+  qIdx=0;qRev=false;
+  renderQuizMenu();
 }
 
-function renderQuizMode() {
-  const el = document.getElementById('quiz-content');
-  const dueCount = quizWords.filter(w => w.isDue).length;
-  el.innerHTML = `
-    <div style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:4px;">
-      ${dueCount > 0 ? `<span style="color:var(--gold);font-weight:700">${dueCount} due</span> · ` : ''}${quizWords.length} words total
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;">
-      ${QUIZ_MODES.map(m => `
-        <div onclick="selectMode('${m.id}')" style="background:${quizMode===m.id?'rgba(240,165,0,.15)':'var(--card)'};border:1.5px solid ${quizMode===m.id?'var(--gold)':'var(--border)'};border-radius:14px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;">
-          <div style="font-size:22px">${m.label.split(' ')[0]}</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;color:${quizMode===m.id?'var(--gold)':'var(--white)'}">${m.label.split(' ').slice(1).join(' ')}</div>
-            <div style="font-size:12px;color:var(--muted)">${m.desc}</div>
-          </div>
+function renderQuizMenu(){
+  const due=qWords.filter(w=>w.isDue).length;
+  document.getElementById('quiz-content').innerHTML=`
+    <div style="text-align:center;color:var(--muted);font-size:13px">${due>0?`<span style="color:var(--gold);font-weight:700">${due} due</span> · `:''}${qWords.length} words</div>
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px">
+      ${[['flip','🃏 Flashcard','Hebrew → tap to reveal'],['type','⌨️ Type it','English → type transliteration']].map(([id,lbl,desc])=>`
+        <div onclick="qMode='${id}';renderQuizMenu()" style="background:${qMode===id?'rgba(240,165,0,.15)':'var(--card)'};border:1.5px solid ${qMode===id?'var(--gold)':'var(--bdr)'};border-radius:14px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px">
+          <div style="font-size:22px">${lbl.split(' ')[0]}</div>
+          <div><div style="font-size:14px;font-weight:600;color:${qMode===id?'var(--gold)':'var(--wht)'}">${lbl.slice(2)}</div><div style="font-size:12px;color:var(--muted)">${desc}</div></div>
         </div>`).join('')}
     </div>
-    ${quizWords.length === 0
-      ? '<div style="text-align:center;color:var(--muted);padding:20px">🎵 Add some songs first!</div>'
-      : `<button onclick="startQuiz()" style="background:var(--gold);color:#000;border:none;border-radius:20px;padding:12px 32px;font-size:15px;font-weight:700;cursor:pointer;width:100%;max-width:340px;">Start →</button>`
-    }
-  `;
+    ${qWords.length?'<button onclick="startQ()" style="background:var(--gold);color:#000;border:none;border-radius:20px;padding:12px 32px;font-size:15px;font-weight:700;cursor:pointer;width:100%;max-width:340px">Start →</button>':'<div style="color:var(--muted);text-align:center">Listen to songs first!</div>'}`;
 }
 
-function selectMode(m) { quizMode = m; renderQuizMode(); }
+function startQ(){qIdx=0;qRev=false;cardT=Date.now();renderCard();}
 
-function startQuiz() {
-  quizIdx = 0; quizRevealed = false;
-  cardStartTime = Date.now();
-  renderCard();
-}
-
-function renderCard() {
-  const el = document.getElementById('quiz-content');
-  if (quizIdx >= quizWords.length) { showQuizDone(); return; }
-  const w = quizWords[quizIdx];
-  const prog = `${quizIdx+1}/${quizWords.length}`;
-  const lvl = w.srs.level;
-  const dots = Array.from({length:6},(_,i)=>`<span style="width:8px;height:8px;border-radius:50%;background:${i<=lvl?'var(--gold)':'var(--border)'}"></span>`).join('');
-  cardStartTime = Date.now();
-
-  if (quizMode === 'type') {
-    // Show English → type transliteration
-    el.innerHTML = `
-      <div style="font-size:13px;color:var(--muted)">${prog} · from ${w.song}</div>
+function renderCard(){
+  const el=document.getElementById('quiz-content');
+  if(qIdx>=qWords.length){showQDone();return;}
+  const w=qWords[qIdx];
+  const lvl=w.srs.lvl;
+  const dots=Array.from({length:6},(_,i)=>`<span style="width:8px;height:8px;border-radius:50%;background:${i<=lvl?'var(--gold)':'var(--bdr)'}"></span>`).join('');
+  cardT=Date.now();
+  if(qMode==='type'){
+    el.innerHTML=`
+      <div style="font-size:13px;color:var(--muted)">${qIdx+1}/${qWords.length} · ${w.song}</div>
       <div style="display:flex;gap:4px;justify-content:center">${dots}</div>
-      <div class="quiz-card" id="qcard" style="min-height:160px">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">What is the transliteration of...</div>
-        <div style="font-size:28px;font-weight:700;color:var(--white);text-align:center;margin-bottom:4px">${w.translation}</div>
-        <div style="font-size:13px;color:var(--muted)">(Hebrew word)</div>
+      <div class="qcard" style="min-height:160px">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Transliteration of...</div>
+        <div style="font-size:26px;font-weight:700;text-align:center">${w.translation}</div>
       </div>
-      <input id="type-input" placeholder="Type transliteration..." 
-        style="width:100%;max-width:340px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--white);font-size:16px;outline:none;text-align:center;"
-        onkeydown="if(event.key==='Enter')checkType()"
-        oninput="this.style.borderColor='var(--border)'">
-      <button onclick="checkType()" class="q-btn next" style="width:100%;max-width:340px">Check →</button>
-      <div id="type-feedback" style="text-align:center;font-size:14px;min-height:20px"></div>
-    `;
-    setTimeout(() => document.getElementById('type-input')?.focus(), 100);
-
-  } else {
-    // Flashcard mode (flip / streak)
-    el.innerHTML = `
-      <div style="font-size:13px;color:var(--muted)">${prog} · from ${w.song}</div>
+      <input id="qi" placeholder="Type transliteration..." style="width:100%;max-width:340px;background:var(--card);border:1.5px solid var(--bdr);border-radius:12px;padding:12px 16px;color:var(--wht);font-size:16px;outline:none;text-align:center" onkeydown="if(event.key==='Enter')checkQ()">
+      <button onclick="checkQ()" class="qbtn next" style="width:100%;max-width:340px">Check →</button>
+      <div id="qfb" style="text-align:center;font-size:14px;min-height:20px"></div>`;
+    setTimeout(()=>document.getElementById('qi')?.focus(),100);
+  }else{
+    el.innerHTML=`
+      <div style="font-size:13px;color:var(--muted)">${qIdx+1}/${qWords.length} · ${w.song}</div>
       <div style="display:flex;gap:4px;justify-content:center">${dots}</div>
-      <div class="quiz-card${quizRevealed?' revealed':''}" id="qcard" onclick="revealCard()">
-        <div class="quiz-heb${w.hebrew.length>8?' sm':''}">${w.hebrew}</div>
-        <div class="quiz-tr">${w.transliteration}</div>
-        <div class="quiz-trans">${w.translation}</div>
-        <div class="quiz-hint">Tap to reveal</div>
+      <div class="qcard${qRev?' rev':''}" id="qc" onclick="revealQ()">
+        <div class="q-he${w.hebrew.length>8?' sm':''}">${w.hebrew}</div>
+        <div class="q-tr">${w.transliteration}</div>
+        <div class="q-en">${w.translation}</div>
+        <div class="q-hint">Tap to reveal</div>
       </div>
-      ${quizRevealed ? `
+      ${qRev?`
         <div style="color:var(--muted);font-size:13px;text-align:center">How well did you know this?</div>
         <div style="display:flex;gap:8px;width:100%;max-width:340px">
-          <button onclick="rateCard(0)" style="flex:1;padding:10px;border-radius:12px;border:1px solid #ff4444;background:rgba(255,68,68,.1);color:#ff6666;font-size:13px;cursor:pointer">😵 Hard</button>
-          <button onclick="rateCard(2)" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--white);font-size:13px;cursor:pointer">😐 OK</button>
-          <button onclick="rateCard(4)" style="flex:1;padding:10px;border-radius:12px;border:1px solid #44cc44;background:rgba(68,204,68,.1);color:#66cc66;font-size:13px;cursor:pointer">😄 Easy</button>
+          <button onclick="rateQ(0)" style="flex:1;padding:10px;border-radius:12px;border:1px solid #f44;background:rgba(255,68,68,.1);color:#f66;font-size:13px;cursor:pointer">😵 Hard</button>
+          <button onclick="rateQ(2)" style="flex:1;padding:10px;border-radius:12px;border:1px solid var(--bdr);background:var(--card);font-size:13px;cursor:pointer">😐 OK</button>
+          <button onclick="rateQ(4)" style="flex:1;padding:10px;border-radius:12px;border:1px solid #4c4;background:rgba(68,204,68,.1);color:#6c6;font-size:13px;cursor:pointer">😄 Easy</button>
         </div>
-      ` : `<button onclick="revealCard()" class="q-btn next" style="width:100%;max-width:340px">Reveal →</button>`}
-    `;
+      `:`<button onclick="revealQ()" class="qbtn next" style="width:100%;max-width:340px">Reveal →</button>`}`;
   }
 }
 
-function revealCard() {
-  quizRevealed = true;
-  const elapsed = Date.now() - cardStartTime;
-  // Track time spent on card
-  const w = quizWords[quizIdx];
-  if (!srsData[w.key]) srsData[w.key] = {level:0, nextReview:0, totalTime:0, reviews:0};
-  srsData[w.key].totalTime = (srsData[w.key].totalTime || 0) + elapsed;
+function revealQ(){
+  qRev=true;
+  const w=qWords[qIdx];
+  const elapsed=Date.now()-cardT;
+  if(!srs[w.k])srs[w.k]={lvl:0,next:0,t:0,n:0};
+  srs[w.k].t=(srs[w.k].t||0)+elapsed;
   renderCard();
 }
 
-function rateCard(rating) {
-  // rating: 0=hard, 2=ok, 4=easy
-  const w = quizWords[quizIdx];
-  const srs = srsData[w.key] || {level:0, nextReview:0, totalTime:0, reviews:0};
-  
-  // Update level based on rating
-  if (rating === 0) srs.level = Math.max(0, srs.level - 1);
-  else if (rating === 2) srs.level = Math.min(5, srs.level + 1);
-  else if (rating === 4) srs.level = Math.min(5, srs.level + 2);
-  
-  srs.reviews = (srs.reviews || 0) + 1;
-  srs.nextReview = Date.now() + SRS_INTERVALS[srs.level];
-  srsData[w.key] = srs;
+function rateQ(r){
+  const w=qWords[qIdx];
+  if(!srs[w.k])srs[w.k]={lvl:0,next:0,t:0,n:0};
+  const s=srs[w.k];
+  s.lvl=Math.max(0,Math.min(5,s.lvl+(r===0?-1:r===2?1:2)));
+  s.n=(s.n||0)+1;
+  s.next=Date.now()+SRS_INT[s.lvl];
   saveSRS();
-
-  // Mark as learned
-  const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-  learnedWords.add(h); saveWords(); updateBadge(); checkMilestone();
-
-  quizIdx++; quizRevealed = false; renderCard();
+  const h=w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
+  learned.add(h);saveW();badge();milestone();
+  qIdx++;qRev=false;renderCard();
 }
 
-function checkType() {
-  const input = document.getElementById('type-input');
-  const feedback = document.getElementById('type-feedback');
-  if (!input) return;
-  
-  const answer = input.value.trim().toLowerCase();
-  const w = quizWords[quizIdx];
-  const correct = w.transliteration.toLowerCase();
-  const elapsed = Date.now() - cardStartTime;
-  
-  const srs = srsData[w.key] || {level:0, nextReview:0, totalTime:0, reviews:0};
-  srs.totalTime = (srs.totalTime || 0) + elapsed;
-  srs.reviews = (srs.reviews || 0) + 1;
-
-  // Fuzzy match: allow small typos
-  const isClose = answer === correct || 
-    answer.replace(/['\`]/g,'') === correct.replace(/['\`]/g,'') ||
-    levenshtein(answer, correct) <= 1;
-
-  if (isClose) {
-    srs.level = Math.min(5, srs.level + (answer === correct ? 2 : 1));
-    srs.nextReview = Date.now() + SRS_INTERVALS[srs.level];
-    input.style.borderColor = '#44cc44';
-    feedback.innerHTML = `<span style="color:#66cc66">✓ ${answer === correct ? 'Perfect!' : `Close enough! (${correct})`}</span>`;
-    const h = w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
-    learnedWords.add(h); saveWords(); updateBadge(); checkMilestone();
-    srsData[w.key] = srs; saveSRS();
-    setTimeout(() => { quizIdx++; quizRevealed = false; renderCard(); }, 1200);
-  } else {
-    srs.level = Math.max(0, srs.level - 1);
-    srs.nextReview = Date.now() + SRS_INTERVALS[0];
-    input.style.borderColor = '#ff4444';
-    feedback.innerHTML = `<span style="color:#ff6666">✗ Answer: <strong>${correct}</strong></span>`;
-    srsData[w.key] = srs; saveSRS();
-    setTimeout(() => { input.value=''; input.style.borderColor='var(--border)'; feedback.innerHTML=''; input.focus(); }, 2000);
+function checkQ(){
+  const inp=document.getElementById('qi');
+  const fb=document.getElementById('qfb');
+  if(!inp)return;
+  const ans=inp.value.trim().toLowerCase();
+  const w=qWords[qIdx];
+  const cor=w.transliteration.toLowerCase();
+  const elapsed=Date.now()-cardT;
+  if(!srs[w.k])srs[w.k]={lvl:0,next:0,t:0,n:0};
+  srs[w.k].t=(srs[w.k].t||0)+elapsed;
+  srs[w.k].n=(srs[w.k].n||0)+1;
+  const ok=ans===cor||ans.replace(/['\`]/g,'')===cor.replace(/['\`]/g,'')||lev(ans,cor)<=1;
+  if(ok){
+    srs[w.k].lvl=Math.min(5,srs[w.k].lvl+(ans===cor?2:1));
+    srs[w.k].next=Date.now()+SRS_INT[srs[w.k].lvl];
+    saveSRS();inp.style.borderColor='#4c4';fb.innerHTML=`<span style="color:#6c6">✓ ${ans===cor?'Perfect!':`Close! (${cor})`}</span>`;
+    const h=w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
+    learned.add(h);saveW();badge();milestone();
+    setTimeout(()=>{qIdx++;qRev=false;renderCard();},1200);
+  }else{
+    srs[w.k].lvl=Math.max(0,srs[w.k].lvl-1);
+    srs[w.k].next=Date.now()+SRS_INT[0];
+    saveSRS();inp.style.borderColor='#f44';fb.innerHTML=`<span style="color:#f66">✗ Answer: <strong>${cor}</strong></span>`;
+    setTimeout(()=>{inp.value='';inp.style.borderColor='var(--bdr)';fb.innerHTML='';inp.focus();},2000);
   }
 }
 
-function levenshtein(a, b) {
-  const m = a.length, n = b.length;
-  const dp = Array.from({length:m+1}, (_,i) => Array.from({length:n+1}, (_,j) => i===0?j:j===0?i:0));
-  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
-    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+function lev(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
   return dp[m][n];
 }
 
-function showQuizDone() {
-  const el = document.getElementById('quiz-content');
-  // Stats
-  const reviewed = quizWords.length;
-  const avgLevel = quizWords.reduce((s,w) => s + (srsData[w.key]?.level || 0), 0) / reviewed;
-  const avgTime = quizWords.reduce((s,w) => s + (srsData[w.key]?.totalTime || 0), 0) / reviewed;
-  
-  el.innerHTML = `
+function showQDone(){
+  const rev=qWords.length;
+  document.getElementById('quiz-content').innerHTML=`
     <div style="text-align:center;padding:20px">
       <div style="font-size:48px;margin-bottom:12px">🏆</div>
       <div style="color:var(--gold);font-size:22px;font-weight:700">Session done!</div>
-      <div style="color:var(--muted);margin-top:8px;font-size:13px">${reviewed} cards reviewed</div>
-      <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
-        <div class="quiz-stat"><div class="quiz-stat-n">${learnedWords.size}</div><div class="quiz-stat-l">total learned</div></div>
-        <div class="quiz-stat"><div class="quiz-stat-n">${Math.round(avgTime/1000)}s</div><div class="quiz-stat-l">avg per card</div></div>
-        <div class="quiz-stat"><div class="quiz-stat-n">${Math.round(avgLevel*10)/10}</div><div class="quiz-stat-l">avg level</div></div>
+      <div style="color:var(--muted);margin-top:8px;font-size:13px">${rev} cards reviewed</div>
+      <div class="qstat-row" style="justify-content:center;margin-top:16px">
+        <div class="qstat"><div class="qstat-n">${learned.size}</div><div class="qstat-l">total learned</div></div>
       </div>
       <button onclick="buildQuiz()" style="margin-top:20px;background:rgba(240,165,0,.15);border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">Go again →</button>
-    </div>
-  `;
+    </div>`;
 }
 
-// Keep old aliases for compatibility
-function nextQuiz() { if (quizIdx < quizWords.length-1) { quizIdx++; quizRevealed=false; renderCard(); } }
-function prevQuiz() { if (quizIdx > 0) { quizIdx--; quizRevealed=false; renderCard(); } }
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-// Scripts are at bottom of body, DOM is ready
-updateBadge();
+// ── INIT ──────────────────────────────────────────────────────
+badge();
 renderGenres();
 renderSongs();
-
 </script>
 </body>
 </html>
