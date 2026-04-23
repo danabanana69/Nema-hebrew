@@ -325,7 +325,7 @@ textarea.mi{min-height:140px;resize:vertical;direction:rtl;line-height:1.6}
   </div>
 </div>
 
-<script src="songs.js?v=1776947200"></script>
+<script src="songs.js"></script>
 <script>
 const GENRES=['All','⭐ Fav','Rock','Pop','Folk','Indie'];
 const MILESTONES=[10,25,50,100];
@@ -881,12 +881,19 @@ function showLevelUp(lvl) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────
-badge();
-updateStreakBar();
-checkStreak();
-checkBadges();
-renderGenres();
-renderSongs();
+function init() {
+  if (typeof SONGS === 'undefined') {
+    setTimeout(init, 50); // wait for songs.js to load
+    return;
+  }
+  badge();
+  updateStreakBar();
+  checkStreak();
+  checkBadges();
+  renderGenres();
+  renderSongs();
+}
+init();
 </script>
 </body>
 </html>
