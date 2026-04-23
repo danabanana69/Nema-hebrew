@@ -90,6 +90,49 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--wht);font
 .large .w-en{font-size:13px}
 .edit-icon{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:var(--surf);border:1px solid var(--bdr);border-radius:50%;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;color:var(--muted);z-index:5}
 .wcard:hover .edit-icon{display:flex}
+
+/* Root popup */
+.root-popup {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surf); border-top: 1.5px solid var(--gold);
+  border-radius: 20px 20px 0 0; padding: 20px;
+  z-index: 100; transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  max-height: 60vh; overflow-y: auto;
+}
+.root-popup.open { transform: translateY(0); }
+.root-tag {
+  display: inline-block; background: rgba(240,165,0,.15);
+  border: 1px solid var(--gold); border-radius: 999px;
+  padding: 4px 12px; font-size: 14px; font-weight: 700;
+  color: var(--gold); margin-bottom: 12px;
+  font-family: 'Frank Ruhl Libre', serif; letter-spacing: 2px;
+}
+.root-family { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.root-word {
+  background: var(--card); border: 1px solid var(--bdr);
+  border-radius: 10px; padding: 10px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.root-he { font-family: 'Frank Ruhl Libre', serif; font-size: 20px; color: var(--gold); }
+.root-en { font-size: 12px; color: var(--muted); }
+
+/* Streak & XP */
+.streak-bar {
+  background: var(--surf); border-bottom: 1px solid var(--bdr);
+  padding: 8px 20px; display: flex; align-items: center;
+  justify-content: space-between; font-size: 13px;
+}
+.streak-fire { font-size: 18px; margin-right: 4px; }
+.streak-count { font-weight: 700; color: var(--gold); }
+.xp-bar-wrap { height: 4px; background: var(--card); border-radius: 2px; flex: 1; margin: 0 12px; }
+.xp-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width .5s; }
+.level-badge { background: rgba(240,165,0,.15); border: 1px solid var(--gold); border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; color: var(--gold); }
+
+/* Word tap animation */
+@keyframes popIn { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+.wcard.hl { animation: popIn .2s ease; }
+
 /* quiz */
 .quiz-wrap{padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:100px}
 .qcard{width:100%;max-width:340px;min-height:180px;background:var(--card);border:1.5px solid var(--bdr);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;cursor:pointer;transition:border-color .3s,box-shadow .3s}
@@ -134,6 +177,11 @@ textarea.mi{min-height:140px;resize:vertical;direction:rtl;line-height:1.6}
     <div><div class="app-name">Nema</div><div class="app-sub">Learning Hebrew through song</div></div>
     <div class="badge" id="badge">✨ 0 words</div>
   </div>
+  <div class="streak-bar" id="streak-bar">
+    <span><span class="streak-fire">🔥</span><span class="streak-count" id="streak-num">0</span> day streak</span>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-fill" style="width:0%"></div></div>
+    <span class="level-badge" id="level-badge">Lv.1</span>
+  </div>
   <div class="tab-bar">
     <button class="tab on" id="tab-songs" onclick="switchTab('songs')">🎵 Songs</button>
     <button class="tab" id="tab-quiz" onclick="switchTab('quiz')">🃏 Quiz</button>
@@ -170,6 +218,17 @@ textarea.mi{min-height:140px;resize:vertical;direction:rtl;line-height:1.6}
   <div id="yt-container" style="display:none"><div class="yt-wrap" id="yt-wrap"></div></div>
   <div class="lscroll" id="lyr-content"></div>
 </div>
+
+
+<!-- ROOT POPUP -->
+<div class="root-popup" id="root-popup">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:15px;font-weight:700;color:var(--wht)">🌱 Word Root</div>
+    <button onclick="closeRoot()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer">✕</button>
+  </div>
+  <div id="root-content"></div>
+</div>
+<div id="root-bg" style="display:none;position:fixed;inset:0;z-index:99" onclick="closeRoot()"></div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -335,9 +394,9 @@ function renderLyrics(){
       const words=line.map((w,wi)=>{
         const wo=wd(cur.id,li,wi,w);
         const hl=hlSet.has(li+'_'+wi)?' hl':'';
-        return `<div class="wcard${hl}" onclick="tapWord(${li},${wi})">
+        return `<div class="wcard${hl}" onclick="tapWord(${li},${wi})" oncontextmenu="showRoot('${wo.hebrew}');event.preventDefault()">
           <div class="edit-icon" onclick="openEdit(${li},${wi},event)">✏</div>
-          <div class="w-he">${wo.hebrew}</div>
+          <div class="w-he" title="Long press for root">${wo.hebrew}</div>
           <div class="w-tr${showTr?'':' hide'}">${wo.transliteration}</div>
           <div class="w-en${showEn?'':' hide'}">${wo.translation}</div>
         </div>`;
@@ -356,7 +415,8 @@ function tapWord(li,wi){
     const h=w.hebrew.replace(/[^\u05d0-\u05ea]/g,'');
     const isNew=!learned.has(h);
     learned.add(h);saveW();badge();
-    if(isNew)milestone();
+    if(isNew){milestone();addXP(10);checkStreak();}
+    else addXP(2);
   }
 }
 
@@ -563,8 +623,94 @@ function showQDone(){
     </div>`;
 }
 
+
+// ── ROOTS ────────────────────────────────────────────────────
+const ROOTS_DATA = {"אהבה":["א-ה-ב","ahav",["אוהב (ohev) loves","אהוב (ahuv) beloved","אהבתי (ahavti) I loved"]],"אוהב":["א-ה-ב","ahav",["אהבה (ahava) love","אהוב (ahuv) beloved"]],"אהוב":["א-ה-ב","ahav",["אהבה (ahava) love","אוהב (ohev) loves"]],"הולך":["ה-ל-כ","halach",["הלך (halach) went","ילך (yelech) will go","הליכה (halicha) walking"]],"הלך":["ה-ל-כ","halach",["הולך (holech) going","ילך (yelech) will go"]],"ילך":["ה-ל-כ","halach",["הולך (holech) going","הלך (halach) went"]],"חוזר":["ח-ז-ר","chazar",["חזר (chazar) returned","יחזור (yachzor) will return","חזרה (chazara) return/rehearsal"]],"חזר":["ח-ז-ר","chazar",["חוזר (chozer) returning","חזרה (chazara) return"]],"שומע":["ש-מ-ע","shama",["שמע (shama) heard","ישמע (yishma) will hear","שמיעה (shmia) hearing"]],"שמע":["ש-מ-ע","shama",["שומע (shomea) hearing","ישמע (yishma) will hear"]],"רואה":["ר-א-ה","ra'a",["ראה (ra'a) saw","יראה (yir'e) will see","ראייה (re'iya) vision"]],"ראה":["ר-א-ה","ra'a",["רואה (ro'e) seeing","יראה (yir'e) will see"]],"מדבר":["ד-ב-ר","diber",["דיבר (diber) spoke","ידבר (yedaber) will speak","דיבור (dibur) speech"]],"דיבר":["ד-ב-ר","diber",["מדבר (medaber) speaking","דיבור (dibur) speech"]],"כותב":["כ-ת-ב","katav",["כתב (katav) wrote","כתיבה (ktiva) writing","כתובת (ktovet) address"]],"כתב":["כ-ת-ב","katav",["כותב (kotev) writing","כתיבה (ktiva) writing","כתובת (ktovet) address"]],"חיים":["ח-י-ה","chaya",["חי (chai) alive","חיה (chaya) lived","חיות (chayut) vitality"]],"חי":["ח-י-ה","chaya",["חיים (chaim) life","חיה (chaya) animal/lived"]],"לומד":["ל-מ-ד","lamad",["למד (lamad) learned","ילמד (yilmad) will learn","מלמד (melamad) teacher"]],"למד":["ל-מ-ד","lamad",["לומד (lomed) learning","מלמד (melamad) teacher"]],"שיר":["ש-י-ר","shir",["שר (shar) sang","שירה (shira) singing/poetry","שירים (shirim) songs"]],"שר":["ש-י-ר","shir",["שיר (shir) song","שירה (shira) poetry"]],"יודע":["י-ד-ע","yada",["ידע (yada) knew","ידיעה (yedia) knowledge","ידוע (yadu'a) known"]],"ידע":["י-ד-ע","yada",["יודע (yode'a) knowing","ידוע (yadu'a) known"]],"ידוע":["י-ד-ע","yada",["יודע (yode'a) knows","ידע (yada) knew"]],"מחפש":["ח-פ-ש","chapas",["חיפש (chips) searched","חיפוש (chipus) search"]],"מרגיש":["ר-ג-ש","ragash",["הרגיש (hirgish) felt","רגש (regesh) emotion","רגשות (regashot) emotions"]],"להרגיש":["ר-ג-ש","ragash",["מרגיש (margish) feeling","רגש (regesh) emotion"]],"זכרונות":["ז-כ-ר","zachar",["זכר (zachar) remembered","זיכרון (zikaron) memory","זוכר (zocher) remembering"]],"זוכר":["ז-כ-ר","zachar",["זכרונות (zichronot) memories","זיכרון (zikaron) memory"]],"עוזב":["ע-ז-ב","azav",["עזב (azav) left","עזיבה (aziva) leaving","שעזבנו (she'azavnu) that we left"]],"נוסע":["נ-ס-ע","nasa",["נסע (nasa) traveled","נסיעה (nesia) travel","לנסוע (linso'a) to travel"]],"בוכה":["ב-כ-ה","bacha",["בכה (bacha) cried","בכי (bchi) crying","בכייה (bchiya) weeping"]],"לשכוח":["ש-כ-ח","shachach",["שכח (shachach) forgot","שוכח (shochach) forgetting","נשכח (nishkach) forgotten"]],"שכחנו":["ש-כ-ח","shachach",["לשכוח (lishkoach) to forget","שכח (shachach) forgot"]],"קרוב":["ק-ר-ב","karav",["קרב (karav) approached","להתקרב (lehitkarev) to get closer","קרבה (kirva) closeness"]],"רחוק":["ר-ח-ק","rachak",["רחק (rachak) distanced","ריחוק (richuk) distance","להתרחק (lehitrachek) to distance"]]};
+
+function showRoot(hebrew) {
+  const clean = hebrew.replace(/[^\u05d0-\u05ea]/g, '');
+  const root = ROOTS_DATA[clean];
+  const el = document.getElementById('root-content');
+  if (!root) {
+    el.innerHTML = `<div style="color:var(--muted);text-align:center;padding:12px">No root data for this word yet</div>`;
+  } else {
+    const [rootLetters, translit, family] = root;
+    el.innerHTML = `
+      <div class="root-tag">${rootLetters}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Root: ${translit}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600">Word family:</div>
+      <div class="root-family">
+        ${family.map(w => {
+          const parts = w.match(/^(.+?)\s*\((.+?)\)\s*(.*)$/);
+          if (!parts) return `<div class="root-word"><span class="root-he">${w}</span></div>`;
+          return `<div class="root-word">
+            <span class="root-he">${parts[1]}</span>
+            <span style="color:var(--muted);font-size:13px">${parts[2]} · ${parts[3]}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+  document.getElementById('root-popup').classList.add('open');
+  document.getElementById('root-bg').style.display = 'block';
+}
+
+function closeRoot() {
+  document.getElementById('root-popup').classList.remove('open');
+  document.getElementById('root-bg').style.display = 'none';
+}
+
+// ── GAMIFICATION ──────────────────────────────────────────────
+let xp = parseInt(localStorage.getItem('nema_xp') || '0');
+let streak = parseInt(localStorage.getItem('nema_streak') || '0');
+let lastActive = localStorage.getItem('nema_last') || '';
+
+function saveXP() { localStorage.setItem('nema_xp', xp); }
+function saveStreak() { localStorage.setItem('nema_streak', streak); }
+
+function getLevel() { return Math.floor(xp / 100) + 1; }
+function getXPInLevel() { return xp % 100; }
+
+function addXP(amount) {
+  const oldLevel = getLevel();
+  xp += amount;
+  saveXP();
+  const newLevel = getLevel();
+  if (newLevel > oldLevel) showLevelUp(newLevel);
+  updateStreakBar();
+}
+
+function checkStreak() {
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (lastActive === today) return; // already active today
+  if (lastActive === yesterday) streak++;
+  else if (lastActive !== '') streak = 1;
+  else streak = 1;
+  lastActive = today;
+  localStorage.setItem('nema_last', today);
+  saveStreak();
+  updateStreakBar();
+}
+
+function updateStreakBar() {
+  const lvl = getLevel();
+  const pct = getXPInLevel();
+  document.getElementById('streak-num').textContent = streak;
+  document.getElementById('xp-fill').style.width = pct + '%';
+  document.getElementById('level-badge').textContent = `Lv.${lvl}`;
+}
+
+function showLevelUp(lvl) {
+  const t = document.getElementById('toast');
+  t.textContent = `🎉 Level ${lvl}!`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 badge();
+updateStreakBar();
+checkStreak();
 renderGenres();
 renderSongs();
 </script>
