@@ -780,7 +780,7 @@ function openWeeklyReport(){
 function showLevelUp(lvl){
   const el=document.getElementById('lvlup');
   document.getElementById('lvlup-text').textContent=`Level ${lvl}!`;
-  const perks={5:'You're on fire! 🔥',10:'Master learner! 🧠',15:'Hebrew hero! 🦸',20:'Legend! 🏆'};
+  const perks={5:"You're on fire! 🔥",10:"Master learner! 🧠",15:"Hebrew hero! 🦸",20:"Legend! 🏆"};
   document.getElementById('lvlup-sub').textContent=perks[lvl]||`Keep going! ${100*lvl} XP total`;
   el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),3000);
