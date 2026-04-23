@@ -715,9 +715,11 @@ function nextQuiz() { if (quizIdx < quizWords.length-1) { quizIdx++; quizReveale
 function prevQuiz() { if (quizIdx > 0) { quizIdx--; quizRevealed=false; renderCard(); } }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-updateBadge();
-renderGenres();
-renderSongs();
+document.addEventListener('DOMContentLoaded', function() {
+  updateBadge();
+  renderGenres();
+  renderSongs();
+});
 </script>
 
 <!-- Edit Popup -->
